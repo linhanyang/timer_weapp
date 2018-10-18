@@ -1,0 +1,40 @@
+<!-- 这是自定义组件countdown的内部WXML结构 -->
+<view class="component__hd">倒计时</view>
+<view class="weui-form-preview">
+    <!-- <view class="component__hd">倒计时</view> -->
+    <view wx:if="{{status==='before'}}" class="weui-form-preview__hd">
+        <view class="weui-form-preview__label">尚未开始</view>
+        <view class="weui-form-preview__value_in-hd">{{countdown}}</view>
+    </view>
+
+    <view wx:if="{{status==='gaming'}}" class="weui-form-preview__hd">
+        <view wx:if="{{breaking}}" class="weui-form-preview__label">级别 {{rounds[currentRoundIndex].level}}休息中</view>
+        <view wx:if="{{!breaking}}" class="weui-form-preview__label">正在进行级别 {{rounds[currentRoundIndex].level}}</view>
+        <view class="weui-form-preview__value_in-hd">{{countdown}}</view>
+    </view>
+
+    <view wx:if="{{status==='after'}}" class="weui-form-preview__hd">
+        <view class="weui-form-preview__label">已经结束</view>
+        <view class="weui-form-preview__value_in-hd">{{countdown}}</view>
+    </view>
+
+    <view wx:if="{{status==='gaming'}}" class="weui-form-preview__bd">
+        <view class="weui-form-preview__item">
+            <view class="weui-form-preview__label">盲注</view>
+            <view class="weui-form-preview__value">{{rounds[currentRoundIndex].smallBlind}}/{{rounds[currentRoundIndex].bigBlind}}</view>
+        </view>
+    </view>
+
+    <view wx:if="{{status==='before'}}" class="weui-form-preview__ft">
+        <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapStartImmediate">立即开始</view>
+    </view>
+
+    <view wx:if="{{status==='gaming'}}" class="weui-form-preview__ft">
+        <view wx:if="{{game.pauseTime}}" class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapResume">继续</view>
+        <view wx:if="{{!game.pauseTime}}" class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapPause">暂停</view>
+    </view>
+
+    <view wx:if="{{status==='after'}}" class="weui-form-preview__ft">
+        <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapStartImmediate">重新开始</view>
+    </view>
+</view>

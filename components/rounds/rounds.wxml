@@ -1,0 +1,23 @@
+<view class="component__hd">盲注列表</view>
+<view class="kind-list">
+    <block wx:for="{{rounds}}" wx:key="objectId" wx:for-item="round">
+        <view class="kind-list__item">
+            <!-- 有操作 -->
+            <view id="{{round.id}}" class="weui-flex kind-list__item-hd {{round.open ? 'kind-list__item-hd_show' : ''}}" bindtap="kindToggle">
+                <view wx:if="{{round.breakDuration && round.breakDuration !== 0}}" class="weui-flex__item">级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟 休息{{round.breakDuration}}分钟</view>
+                <view wx:if="{{!round.breakDuration || round.breakDuration === 0}}" class="weui-flex__item">级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟 </view>
+                <image class="kind-list__img" src="../../images/icon_nav_nav.png"></image>
+            </view>
+            <view class="kind-list__item-bd {{round.open ? 'kind-list__item-bd_show' : ''}}">
+                <view class="weui-cells {{round.open ? 'weui-cells_show' : ''}}">
+                    <block wx:for="{{round.actions}}" wx:for-item="action" wx:key="key">
+                        <view bind:tap="tapAction" data-action="{{action}}" data-round-level="{{round.level}}" class="weui-cell weui-cell_access">
+                            <view class="weui-cell__bd">{{action.lbl}}</view>
+                            <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                        </view>
+                    </block>
+                </view>
+            </view>
+        </view>
+    </block>
+</view>

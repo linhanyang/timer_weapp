@@ -1,0 +1,44 @@
+
+<view class="page">
+    <view class="page__bd page__bd_spacing">
+        <view class="weui-cells__title">请输入盲注模板信息</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_input {{titleError ? 'weui-cell_warn' : ''}}">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">模板名称</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input id="title" auto-focus class="weui-input" placeholder="请输入模板名称" value="{{pattern.title}}" bindblur="bindTitleBlur" />
+                </view>
+                <view wx:if="{{titleError}}" class="weui-cell__ft">
+                    <icon id="title" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>
+                </view>
+            </view>
+        </view>
+        <view class="component__hd">盲注列表</view>
+        <view wx:if="{{!rounds||rounds.length===0}}" class="weui-cells__title">
+            盲注列表为空，请用【追加级别】添加。
+        </view>
+        <block wx:for="{{rounds}}" wx:key="objectId" wx:for-item="round" wx:for-index="idx">
+            <i-swipeout i-class="i-swipeout-item" operateWidth="{{60}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" actions="{{soActions}}" 
+            data-round-level="{{round.level}}" bindchange="handlerSoChange" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+                <view slot="content" bindtap="handlerSoCotentTap" data-round-level="{{round.level}}">
+                    <i-cell  wx:if="{{round.breakDuration && round.breakDuration !== 0}}" i-class="i-cell-padding">
+                        级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟 休息{{round.breakDuration}}分钟
+                    </i-cell >
+                    <i-cell iew wx:if="{{!round.breakDuration || round.breakDuration === 0}}" i-class="i-cell-padding">
+                        级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟
+                    </i-cell >
+                </view>
+            </i-swipeout>
+        </block>
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="normal" bindtap="bindAppendTap" loading="{{saving}}">
+                追加级别
+            </button>
+            <button class="weui-btn" type="primary" bindtap="bindSubmitTap" loading="{{saving}}">
+                确定
+            </button>
+        </view>
+    </view>
+</view>

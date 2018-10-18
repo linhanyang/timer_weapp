@@ -1,0 +1,106 @@
+<!-- 这是自定义组件desc的内部WXML结构 -->
+<wxs src="../../utils/util.wxs" module="util" />
+<view class="component__hd">比赛详情</view>
+<view class="weui-panel weui-panel_access">
+    <!-- <view class="weui-panel__hd">比赛详情</view> -->
+    <view class="weui-panel__bd">
+        <view class="weui-media-box weui-media-box_text">
+            <view class="weui-media-box__title weui-media-box__title_in-text">{{game.title}}--{{game.subTitle}}</view>
+            <view class="weui-form-preview__item">
+                <view class="weui-form-preview__label">开始时间</view>
+                <view class="weui-form-preview__value">{{util.formatShortTime(game.startTimeMills)}}</view>
+            </view>
+            <view class="weui-form-preview__item">
+                <view class="weui-form-preview__label">起始筹码</view>
+                <view class="weui-form-preview__value">{{game.startChips}}$</view>
+            </view>
+            <view wx:if="{{game.rebuy}}" class="weui-form-preview__item">
+                <view class="weui-form-preview__label">重买筹码</view>
+                <view class="weui-form-preview__value">{{game.rebuyChips}}$</view>
+            </view>
+            <view wx:if="{{game.addon}}" class="weui-form-preview__item">
+                <view class="weui-form-preview__label">加买筹码</view>
+                <view class="weui-form-preview__value">{{game.addonChips}}$</view>
+            </view>
+        </view>
+    </view>
+</view>
+
+<view wx:if="{{game.rebuy}}" class="weui-cell weui-cell_input">
+    <view class="weui-cell__hd">
+        <view class="weui-form-preview__label">重买人次</view>
+    </view>
+    <view class="weui-cell__bd">
+        <button  class="weui-btn mini-btn" type="primary" size="mini" disabled="{{!game.rebuyCount || game.rebuyCount === 0}}" data-action="subtract" data-props="rebuyCount" bindtap="bindActionTap">-</button>
+    </view>
+    <view class="weui-cell__bd">
+        <input id="rebuyCount" type="number" class="weui-input" value="{{game.rebuyCount?game.rebuyCount:0}}" />
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" data-action="add" data-props="rebuyCount" bindtap="bindActionTap">+</button>
+    </view>
+</view>
+
+
+<view wx:if="{{game.addon}}" class="weui-cell weui-cell_input">
+    <view class="weui-cell__hd">
+        <view class="weui-form-preview__label">加买人次</view>
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" data-action="subtract" data-props="addonCount" disabled="{{!game.addonCount || game.addonCount === 0}}"  bindtap="bindActionTap">-</button>
+    </view>
+    <view class="weui-cell__bd">
+        <input id="addonCount" type="number" class="weui-input" value="{{game.addonCount?game.addonCount:0}}" />
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" data-action="add" data-props="addonCount" bindtap="bindActionTap">+</button>
+    </view>
+</view>
+
+
+<view class="weui-cell weui-cell_input">
+    <view class="weui-cell__hd">
+        <view class="weui-form-preview__label">玩家人数</view>
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" disabled="{{!game.players || game.players === 0}}"   data-action="subtract" data-props="players" bindtap="bindActionTap">-</button>
+    </view>
+    <view class="weui-cell__bd">
+        <input id="players" type="number" class="weui-input" value="{{game.players?game.players:0}}" />
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" data-action="add" data-props="players" bindtap="bindActionTap">+</button>
+    </view>
+</view>
+
+
+
+<view class="weui-cell weui-cell_input">
+    <view class="weui-cell__hd">
+        <view class="weui-form-preview__label">剩余人数</view>
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" disabled="{{!game.restPlayers || game.restPlayers === 0}}"   data-action="subtract" data-props="restPlayers" bindtap="bindActionTap">-</button>
+    </view>
+    <view class="weui-cell__bd">
+        <input id="restPlayers" type="number" class="weui-input" value="{{game.restPlayers?game.restPlayers:0}}" />
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" data-action="add" data-props="restPlayers" bindtap="bindActionTap">+</button>
+    </view>
+</view>
+
+<view class="weui-cell weui-cell_input">
+    <view class="weui-cell__hd">
+        <view class="weui-form-preview__label">奖励人数</view>
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" disabled="{{!game.rewardPlayers || game.rewardPlayers === 0}}"   data-action="subtract" data-props="rewardPlayers" bindtap="bindActionTap">-</button>
+    </view>
+    <view class="weui-cell__bd">
+        <input id="rewardPlayers" type="number" class="weui-input" value="{{game.rewardPlayers?game.rewardPlayers:0}}" />
+    </view>
+    <view class="weui-cell__bd">
+        <button class="weui-btn mini-btn" type="primary" size="mini" data-action="add" data-props="rewardPlayers" bindtap="bindActionTap">+</button>
+    </view>
+</view>

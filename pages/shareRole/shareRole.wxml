@@ -1,0 +1,43 @@
+<canvas style="width: 200px; height: 200px;" canvas-id="userQrcode"></canvas>
+<view class="page">
+    <view class="page__bd page__bd_spacing">
+        <view wx:if="{{isShared}}">
+            <i-panel title="共享权限信息">
+                <view style="padding: 15px;">
+                    您正使用[{{sharedUser?sharedUser.objectId:'unknown'}}]的用户权限。
+                </view>
+            </i-panel>
+            <view class="weui-btn-area">
+                <button class="weui-btn" type="primary" bindtap="bindCancelShareTap" loading="{{canceling}}">
+                    取消共享他人权限
+                </button>
+            </view>
+        </view>
+        <view wx:if="{{!isShared}}">
+            <view class="weui-btn-area">
+                <button class="weui-btn" type="primary" bindtap="bindScanToShareTap" loading="{{sharing}}">
+                    扫一扫送出权限
+                </button>
+            </view>
+            <view class="component__hd">已共享你权限的用户</view>
+            <block wx:for="{{users}}" wx:key="objectId" wx:for-item="user">
+                <i-swipeout i-class="i-swipeout-item" operateWidth="{{70}}" unclosable="{{true}}" toggle="{{toggle}}">
+                    <view slot="content">
+                        <i-cell i-class="i-cell-padding" title="{{user.objectId}}" label="{{user.username}}}"></i-cell>
+                    </view>
+                    <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
+                        <view class="i-swipeout-button" style="width:70px" bindtap="soDeleteTapAction" data-user="{{user.objectId}}">
+                            <i-icon size="48" type="delete_fill"></i-icon>
+                        </view>
+                    </view>
+                </i-swipeout>
+            </block>
+            <i-action-sheet visible="{{ asVisible }}" actions="{{ asActions }}" show-cancel bind:cancel="handleASCancel" bind:click="handleClickASItem" mask-closable="{{ false }}">
+                <view slot="header" style="padding: 16px">
+                    <view style="color: #444;font-size: 16px">确定删除用户[{{soUser.objectId}}]吗？</view>
+                    <text>删除后无法恢复哦</text>
+                </view>
+            </i-action-sheet>
+        </view>
+    </view>
+</view>

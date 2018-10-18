@@ -1,0 +1,32 @@
+<wxs src="../../utils/util.wxs" module="util" />
+<view class="page">
+    <view class="page__bd page__bd_spacing">
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="primary" bindtap="bindScanTap" loading="{{saving}}">
+                扫一扫添加屏幕
+            </button>
+        </view>
+        <view class="component__hd">屏幕列表</view>
+        <block wx:for="{{deviceUsers}}" wx:key="objectId" wx:for-item="deviceUser" wx:for-index="idx">
+            <i-swipeout i-class="i-swipeout-item" operateWidth="{{120}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+                <view slot="content" catch:tap="soCotentTapAction" data-device-user="{{deviceUser.objectId}}">
+                    <i-cell i-class="i-cell-padding" title="{{deviceUser.title1}}" label="{{deviceUser.label}}"></i-cell>
+                </view>
+                <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
+                    <view class="i-swipeout-button" style="width:60px" bind:tap="soItemTapAction" data-action="name" data-device-user="{{deviceUser.objectId}}">
+                        <i-icon size="48" type="editor"></i-icon>
+                    </view>
+                    <view class="i-swipeout-button" style="width:60px" bind:tap="soItemTapAction" data-action="delete" data-device-user="{{deviceUser.objectId}}">
+                        <i-icon size="48" type="delete_fill"></i-icon>
+                    </view>
+                </view>
+            </i-swipeout>
+        </block>
+        <i-action-sheet visible="{{ asVisible }}" actions="{{ asActions }}" show-cancel bind:cancel="handleASCancel" bind:click="handleASItemClick" mask-closable="{{ false }}">
+            <view slot="header" style="padding: 16px">
+                <view style="color: #444;font-size: 16px">{{asContent}}</view>
+                <text>删除后无法恢复哦</text>
+            </view>
+        </i-action-sheet>
+    </view>
+</view>

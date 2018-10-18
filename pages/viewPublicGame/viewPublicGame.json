@@ -1,0 +1,9 @@
+{
+    "navigationBarTitleText": "比赛详情",
+    "usingComponents": {
+        "countdown": "../../components/countdown/countdown",
+        "desc": "../../components/desc/desc",
+        "rounds": "../../components/rounds/rounds",
+        "screens": "../../components/screens/screens"
+    }
+}

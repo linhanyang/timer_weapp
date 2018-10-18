@@ -1,0 +1,31 @@
+<!-- 工具类 -->
+<wxs src="../../utils/util.wxs" module="util" />
+<view class="page">
+    <view class="page__bd page__bd_spacing">
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="primary" bindtap="bindAppendTap" loading="{{saving}}">新建模板</button>
+        </view>
+        <view class="component__hd">公共盲注列表</view>
+        <view class="kind-list">
+            <block wx:for="{{patterns}}" wx:key="objectId" wx:for-item="pattern">
+                <view class="kind-list__item">
+                    <!-- 有操作 -->
+                    <view id="{{pattern.objectId}}" class="weui-flex kind-list__item-hd {{pattern.open ? 'kind-list__item-hd_show' : ''}}" bindtap="kindToggle">
+                        <view class="weui-flex__item">{{pattern.title}}</view>
+                        <image class="kind-list__img" src="../../images/icon_nav_nav.png"></image>
+                    </view>
+                    <view class="kind-list__item-bd {{pattern.open ? 'kind-list__item-bd_show' : ''}}">
+                        <view class="weui-cells {{pattern.open ? 'weui-cells_show' : ''}}">
+                            <block wx:for="{{pattern.actions}}" wx:for-item="action" wx:key="key">
+                                <view bind:tap="tapAction" data-action="{{action}}" data-pattern="{{pattern.objectId}}" class="weui-cell weui-cell_access">
+                                    <view class="weui-cell__bd">{{action.lbl}}</view>
+                                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                                </view>
+                            </block>
+                        </view>
+                    </view>
+                </view>
+            </block>
+        </view>
+    </view>
+</view>

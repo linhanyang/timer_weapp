@@ -1,0 +1,28 @@
+<view class="page">
+    <view class="page__bd page__bd_spacing">
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="primary" bindtap="handleCreatePattern" loading="{{saving}}">
+                新建模板
+            </button>
+        </view>
+        <view class="component__hd">盲注模板列表</view>
+        <block wx:for="{{patterns}}" wx:key="objectId" wx:for-item="pattern" wx:for-index="idx">
+            <i-swipeout i-class="i-swipeout-item" operateWidth="{{70}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+                <view slot="content" catch:tap="soCotentTapAction" data-pattern="{{pattern.objectId}}">
+                    <i-cell i-class="i-cell-padding" title="{{pattern.title}}" label="{{pattern.title}}"></i-cell>
+                </view>
+                <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
+                    <view class="i-swipeout-button" style="width:70px" bindtap="soDeleteTapAction" data-pattern="{{pattern.objectId}}">
+                        <i-icon size="48" type="delete_fill"></i-icon>
+                    </view>
+                </view>
+            </i-swipeout>
+        </block>
+        <i-action-sheet visible="{{ asVisible }}" actions="{{ asActions }}" show-cancel bind:cancel="handleASCancel" bind:click="handleASItemClick" mask-closable="{{ false }}">
+            <view slot="header" style="padding: 16px">
+                <view style="color: #444;font-size: 16px">确定删除模板[{{soPattern.title}}]吗？</view>
+                <text>删除后无法恢复哦</text>
+            </view>
+        </i-action-sheet>
+    </view>
+</view>

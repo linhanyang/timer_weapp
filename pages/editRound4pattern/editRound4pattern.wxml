@@ -1,0 +1,58 @@
+<form bindsubmit="formSubmit" class="page__bd">
+    <view class="weui-cells__title">请输入级别详情</view>
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell">
+            <view class="weui-cell__hd">
+                <view class="weui-label">级别</view>
+            </view>
+            <view class="weui-cell__bd">
+                <view class="weui-label">{{round.level}}</view>
+            </view>
+        </view>
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label">前注</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="ante" disabled="{{submitting}}" class="weui-input" type="number" placeholder="请输入前注" value="{{round.ante}}" auto-focus confirm-type="next" />
+            </view>
+        </view>
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label">小盲</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="smallBlind" disabled="{{submitting}}" class="weui-input" type="number" placeholder="请输入小盲" value="{{round.smallBlind}}" confirm-type="next" />
+            </view>
+        </view>
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label">大盲</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="bigBlind" disabled="{{submitting}}" class="weui-input" type="number" placeholder="请输入大盲" value="{{round.bigBlind}}" confirm-type="next" />
+            </view>
+        </view>
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label">时长</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="duration" disabled="{{submitting}}" class="weui-input" type="number" placeholder="请输入时长" value="{{round.duration}}" confirm-type="next" />
+            </view>
+        </view>
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label">休息时长</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="breakDuration" disabled="{{submitting}}" class="weui-input" type="number" placeholder="请输入休息时长" value="{{round.breakDuration?round.breakDuration:0}}" confirm-type="done" />
+            </view>
+        </view>
+    </view>
+
+    <view class="weui-btn-area">
+        <button wx:if="{{action==='add'}}" loading="{{submitting}}" class="weui-btn" type="primary" formType="submit">确定添加</button>
+        <button wx:if="{{action==='edit'}}" loading="{{submitting}}" class="weui-btn" type="primary" formType="submit">保存编辑</button>
+    </view>
+</form>
