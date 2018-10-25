@@ -6,7 +6,7 @@
             </button>
         </view>
         <view class="component__hd">盲注模板列表</view>
-        <block wx:for="{{patterns}}" wx:key="objectId" wx:for-item="pattern" wx:for-index="idx">
+        <block wx:for="{{patternsForView}}" wx:key="objectId" wx:for-item="pattern" wx:for-index="idx">
             <i-swipeout i-class="i-swipeout-item" operateWidth="{{70}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
                 <view slot="content" catch:tap="soCotentTapAction" data-pattern="{{pattern.objectId}}">
                     <i-cell i-class="i-cell-padding" title="{{pattern.title}}" label="{{pattern.title}}"></i-cell>

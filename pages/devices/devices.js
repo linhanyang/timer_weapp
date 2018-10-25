@@ -233,15 +233,15 @@ Page({
      * @param {*} gameIds 
      * @param {*} that 
      */
-    _fetchDeviceUserWithGame: function (dusers, gameIds, that) {
+    _fetchDeviceUserWithGame: function (deviceUsers, gameIds, that) {
         console.log(`devices:_fetchDeviceUserWithGame:gameIds:${JSON.stringify(gameIds)}`);
         let gameQuery = new Parse.Query(Game);
         gameQuery.select("title");
         gameQuery.containsAll("objectId", gameIds);
         return gameQuery.find().then(function (games) {
-            let deviceUsers = [];
-            for (let i = 0; i < dusers.length; i++) {
-                const deviceUser = dusers[i];
+            let deviceUsersForView = [];
+            for (let i = 0; i < deviceUsers.length; i++) {
+                const deviceUser = deviceUsers[i];
                 let device = deviceUser.get('device');
 
                 //微信wxml中只能获取子 不能获取孙 
@@ -258,13 +258,10 @@ Page({
 
                 console.log(`devices:_fetchDeviceUsers:label:${JSON.stringify(label)}`);
                 let uuid = device.get('uuid');
-
                 let title = `${deviceUser.get('title')} [${uuid}]`;
 
-                deviceUser.set('uuid', uuid);
-                deviceUser.set('label', label);
-                deviceUser.set('title1', title);
-                deviceUsers.push(deviceUser);
+                let deviceUserForView = { objectId: deviceUser.id, id: deviceUser.id, uuid, label, title };
+                deviceUsersForView.push(deviceUserForView);
             }
 
             console.log(`devices:_fetchDeviceUsers:deviceUsers:${deviceUsers.length}`);
@@ -277,6 +274,7 @@ Page({
             that.setData({
                 loading: false,
                 deviceUsers,
+                deviceUsersForView,
                 needReload: false,
                 toggles
             });
@@ -290,11 +288,11 @@ Page({
      * @param {*} dusers 
      * @param {*} that 
      */
-    _fetchDeviceUserNoGame: function (dusers, that) {
+    _fetchDeviceUserNoGame: function (deviceUsers, that) {
 
-        let deviceUsers = [];
-        for (let i = 0; i < _deviceUser.length; i++) {
-            const deviceUser = _deviceUser[i];
+        let deviceUsersForView = [];
+        for (let i = 0; i < deviceUsers.length; i++) {
+            const deviceUser = deviceUsers[i];
             let device = deviceUser.get('device');
             //微信wxml中只能获取子 不能获取孙 
             //先初始化要显示出来的label
@@ -303,10 +301,9 @@ Page({
 
             let title = `${deviceUser.get('title')} [${uuid}]`;
 
-            deviceUser.set('uuid', uuid);
-            deviceUser.set('label', label);
-            deviceUser.set('title1', title);
-            deviceUsers.push(deviceUser);
+
+            let deviceUserForView = { objectId: deviceUser.id, id: deviceUser.id, uuid, label, title };
+            deviceUsersForView.push(deviceUserForView);
         }
         //初始化toggles为全部关闭
         let toggles = [];
@@ -317,6 +314,7 @@ Page({
         that.setData({
             loading: false,
             deviceUsers,
+            deviceUsersForView,
             needReload: false,
             toggles
         });
@@ -351,6 +349,22 @@ Page({
                 return that._fetchDeviceUserNoGame(deviceUsers, that);
             }
         });
+    },
+
+
+    /**
+     * wxml中wx:for如果传Parse Object
+     * 凡是通过object.get('name')来获取的数据都可能为空 还会报Expect FLOW_CREATE_NODE but get another错误
+     * 所以重新生成一gamesForView数组，专门用于wxml中显示使用
+     */
+    _createDeviceUsersForView: function (deviceUsers) {
+        let deviceUsersForView = [];
+        deviceUsers.forEach(item => {
+            //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
+            //添加startTimeMills字段，根据startTime的getTime()生成startTimeMills 
+            deviceUsersForView.push({ objectId: item.id, id: item.id, title: item.get('title'), subTitle: item.get('subTitle'), startTime: item.get('startTime'), startTimeMills: item.get('startTime').getTime() })
+        });
+        return deviceUsersForView;
     },
 
     /**

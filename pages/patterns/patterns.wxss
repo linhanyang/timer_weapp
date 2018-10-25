@@ -1,4 +1,4 @@
-
+/* 
 .i-swipeout-item{
     border-bottom:rgb(19, 12, 12) solid 1px;
 }
@@ -23,4 +23,4 @@
     background:#2d8cf0;
     color:#fff;
     align-items:center;
-}
+} */

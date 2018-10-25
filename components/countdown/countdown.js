@@ -31,7 +31,7 @@ Component({
         console.log(`countdown:attached`);
     },
     ready: function () {
-        console.log(`countdown:ready:this.game:${JSON.stringify(this.properties.game)}`);
+        // console.log(`countdown:ready:this.game:${this.properties.game.title}`);
         this._getCountdown();
         if (this.properties.game && !this.properties.game.pauseTime) {
             interval = setInterval(() => this._getCountdown(), 980);
@@ -52,7 +52,7 @@ Component({
      */
     methods: {
         _gameChange(newGame, oldGame) {
-            console.log(`countdown:_gameChange:newGame:${newGame && JSON.stringify(newGame)}`);
+            console.log(`countdown:_gameChange:newGame:${newGame.title}`);
             if (newGame && newGame.rounds) {
                 //如果是暂停
                 if (newGame && newGame.pauseTime) {
@@ -67,10 +67,7 @@ Component({
                     }
                 }
 
-                this.setData({ rounds: [...this._appendRoundStartTime(newGame)] },
-                    function () {
-                        console.log(`countdown:setDataFinished:rounds`);
-                    });
+                this.setData({ rounds: [...this._appendRoundStartTime(newGame)] });
             }
         },
         /**

@@ -1,4 +1,4 @@
-@import '../../app.wxss';
+/* @import '../../app.wxss';
 .weui-flex{-webkit-box-align:center;-webkit-align-items:center;align-items:center}
 .weui-cells-c{margin-top:0;opacity:0;-webkit-transform:translateY(-50%);transform:translateY(-50%);-webkit-transition:.3s;transition:.3s} 
 .weui-cells:after, 
@@ -38,4 +38,4 @@
     background:#2d8cf0;
     color:#fff;
     align-items:center;
-}
+} */

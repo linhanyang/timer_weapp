@@ -8,7 +8,7 @@
                     <view class="weui-label">模板名称</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="title" auto-focus class="weui-input" placeholder="请输入模板名称" value="{{pattern.title}}" bindblur="bindTitleBlur" />
+                    <input id="title" auto-focus class="weui-input" placeholder="请输入模板名称" value="{{patternForView.title}}" bindblur="bindTitleBlur" />
                 </view>
                 <view wx:if="{{titleError}}" class="weui-cell__ft">
                     <icon id="title" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>

@@ -1,23 +1,22 @@
 <view class="component__hd">盲注列表</view>
-<view class="kind-list">
-    <block wx:for="{{rounds}}" wx:key="objectId" wx:for-item="round">
-        <view class="kind-list__item">
-            <!-- 有操作 -->
-            <view id="{{round.id}}" class="weui-flex kind-list__item-hd {{round.open ? 'kind-list__item-hd_show' : ''}}" bindtap="kindToggle">
-                <view wx:if="{{round.breakDuration && round.breakDuration !== 0}}" class="weui-flex__item">级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟 休息{{round.breakDuration}}分钟</view>
-                <view wx:if="{{!round.breakDuration || round.breakDuration === 0}}" class="weui-flex__item">级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟 </view>
-                <image class="kind-list__img" src="../../images/icon_nav_nav.png"></image>
-            </view>
-            <view class="kind-list__item-bd {{round.open ? 'kind-list__item-bd_show' : ''}}">
-                <view class="weui-cells {{round.open ? 'weui-cells_show' : ''}}">
-                    <block wx:for="{{round.actions}}" wx:for-item="action" wx:key="key">
-                        <view bind:tap="tapAction" data-action="{{action}}" data-round-level="{{round.level}}" class="weui-cell weui-cell_access">
-                            <view class="weui-cell__bd">{{action.lbl}}</view>
-                            <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-                        </view>
-                    </block>
+<view wx:for="{{rounds}}" wx:key="objectId" wx:for-item="round" wx:for-index="idx">
+    <i-swipeout operateWidth="{{round.actions.length * 60}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+        <view slot="content" catch:tap="soCotentTapAction" data-round-level="{{round.level}}">
+            <i-cell wx:if="{{round.breakDuration && round.breakDuration !== 0}}" i-class="i-cell-padding" style="{{round.style}}" title="级别{{round.level}} {{round.ante}}/{{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟" label="休息{{round.breakDuration}}分钟"></i-cell>
+            <i-cell wx:if="{{!round.breakDuration || round.breakDuration == 0}}" i-class="i-cell-padding" style="{{round.style}}" title="级别{{round.level}} {{round.ante}}/{{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟" ></i-cell>
+        </view>
+        <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
+            <view wx:for="{{round.actions}}" wx:for-item="action" wx:key="key" class="i-swipeout-button" style="width:60px">
+                <view bind:tap="soItemTapAction" data-action="{{action.key}}" data-round-level="{{round.level}}">
+                    {{action.lbl}}
                 </view>
             </view>
         </view>
-    </block>
+    </i-swipeout>
 </view>
+<i-action-sheet visible="{{ asVisible }}" actions="{{ asActions }}" show-cancel bind:cancel="handleASCancel" bind:click="handleASItemClick" mask-closable="{{ false }}">
+    <view slot="header" style="padding: 16px">
+        <view style="color: #444;font-size: 16px">你确定要删除级别{{soRound.level}}吗？</view>
+        <text>删除后无法恢复哦</text>
+    </view>
+</i-action-sheet>

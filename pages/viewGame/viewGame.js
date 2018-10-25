@@ -7,7 +7,7 @@ Page({
      * 页面的初始数据
      */
     data: {
-        game: {},
+        game: undefined,
         currentRoundIndex: -1,
         status: ''
     },
@@ -222,19 +222,7 @@ Page({
         //更新game
         this._updateGame(game);
     },
-    kindToggle: function (e) {
-        var id = e.currentTarget.id, list = this.data.list;
-        for (var i = 0, len = list.length; i < len; ++i) {
-            if (list[i].id == id) {
-                list[i].open = !list[i].open
-            } else {
-                list[i].open = false
-            }
-        }
-        this.setData({
-            list: list
-        });
-    },
+
     /**
      * 根据ID获取game详情
      */
@@ -244,6 +232,7 @@ Page({
         let query = new Parse.Query(Game);
         query.include('screens');
         query.get(objectId).then(function (game) {
+            console.log(`viewGame:_fetchGame:game:${game.get('title')}`);
             //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
             //添加startTimeMills、pauseTimeMills字段，根据startTime、pauseTime的getTime()生成startTimeMills
             game.set('startTimeMills', game.get('startTime').getTime());

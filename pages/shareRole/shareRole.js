@@ -35,6 +35,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    console.log(`sharedRole:onLoad:options:${JSON.stringify(options)}`)
     if (Parse.User.current()) {
       console.log(`sharedRole:onLoad:currentUser:${Parse.User.current().get('username')}`);
       this._init();
@@ -43,8 +44,8 @@ Page({
       console.log(`sharedRole:onLoad:currentUser is null`)
       let app = getApp();
       let that = this;
-      app.userInfoReadyCallback = res => {
-        console.log(`sharedRole:onLoad:userInfoReadyCallback:${Parse.User.current().get('username')}`)
+      app.userReadyCallback = res => {
+        console.log(`sharedRole:onLoad:userReadyCallback:${Parse.User.current().get('username')}`)
         that._init();
         // this._liveQuery();
       }
@@ -66,6 +67,16 @@ Page({
     }
   },
 
+  onShareAppMessage: function (object) {
+    console.log(`devices:onShareAppMessage:object:${JSON.stringify(object)}`);
+    // path:'/pages/index/index?userId='+ userId, //这里拼接需要携带的参数
+    let userId = Parse.User.current() ? Parse.User.current().id : '';
+    return {
+      title: "分享权限",
+      imageUrl: "https://cdn2.jianshu.io/assets/default_avatar/1-04bbeead395d74921af6a4e8214b4f61.jpg?imageMogr2/auto-orient/strip|imageView2/1/w/120/h/120",
+      path: '/pages/shareRole/shareRole?userId=' + userId
+    }
+  },
   /**
    * 扫描添加共享权限给他人
    */

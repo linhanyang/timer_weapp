@@ -32,13 +32,6 @@ Page({
     },
 
     /**
-     * 生命周期函数--监听页面初次渲染完成
-     */
-    onReady: function () {
-
-    },
-
-    /**
      * 生命周期函数--监听页面显示
      */
     onShow: function () {
@@ -49,25 +42,22 @@ Page({
     },
 
     /**
-     * 生命周期函数--监听页面隐藏
-     */
-    onHide: function () {
-
-    },
-
-    /**
      * 生命周期函数--监听页面卸载
      */
     onUnload: function () {
 
     },
 
+    /**
+     * 新建按钮事件
+     */
     handleCreatePattern: function (e) {
         //跳转到editPattern的编辑界面
         wx.navigateTo({
             url: `../editPattern/editPattern?action=add`,
         })
     },
+
     /**
      * 单击有两种操作
      * 如果是展开状态，关闭展开
@@ -224,24 +214,37 @@ Page({
             loading: true,
         });
         let that = this;
-        console.log(`patterns:_fetchPatterns`);
         let query = new Parse.Query(Pattern);
         query.descending('createdAt');
         query.include('rounds');
-        query.find().then(function (result) {
+        query.find().then(function (patterns) {
+            console.log(`patterns:_fetchPatterns:patterns:${JSON.stringify(patterns)}`);
             //初始化toggles为全部关闭
             let toggles = [];
-            result.forEach(pattern => {
+            patterns.forEach(pattern => {
                 toggles.push(false);
             });
 
             that.setData({
-                patterns: result,
+                patterns,
+                patternsForView: that._createPatternsForView(patterns),
                 needReload: false,
                 toggles
             });
 
         });
-    }
+    },
+    /**
+     * wxml中wx:for如果传Parse Object
+     * 凡是通过object.get('name')来获取的数据都可能为空 还会报Expect FLOW_CREATE_NODE but get another错误
+     * 所以重新生成一gamesForView数组，专门用于wxml中显示使用
+     */
+    _createPatternsForView: function (patterns) {
+        let patternsForView = [];
+        patterns.forEach(item => {
+            patternsForView.push({ objectId: item.id, id: item.id, title: item.get('title'), rounds: item.get('rounds') })
+        });
+        return patternsForView;
+    },
 
 })

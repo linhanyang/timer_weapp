@@ -19,6 +19,11 @@
                     扫一扫送出权限
                 </button>
             </view>
+            <view class="weui-btn-area">
+                <button class="weui-btn" type="primary" open-type="share" bind:tap="onSharetap" loading="{{sharing}}">
+                    转发权限给好友
+                </button>
+            </view>
             <view class="component__hd">已共享你权限的用户</view>
             <block wx:for="{{users}}" wx:key="objectId" wx:for-item="user">
                 <i-swipeout i-class="i-swipeout-item" operateWidth="{{70}}" unclosable="{{true}}" toggle="{{toggle}}">
@@ -26,7 +31,7 @@
                         <i-cell i-class="i-cell-padding" title="{{user.objectId}}" label="{{user.username}}}"></i-cell>
                     </view>
                     <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
-                        <view class="i-swipeout-button" style="width:70px" bindtap="soDeleteTapAction" data-user="{{user.objectId}}">
+                        <view class="i-swipeout-button" style="width:70px" bindtap="soDeleteTapAction">
                             <i-icon size="48" type="delete_fill"></i-icon>
                         </view>
                     </view>

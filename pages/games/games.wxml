@@ -1,46 +1,29 @@
-<!-- 工具类 -->
 <wxs src="../../utils/util.wxs" module="util" />
-<!-- GameItem模板 -->
-<template name="gameItem">
-    <view class="weui-form-preview">
-        <view class="weui-form-preview__hd">
-            <view class="weui-form-preview__label">{{util.formatShortTime(startTimeMills)}}</view>
-            <view class="weui-form-preview__value_in-hd">{{title}}</view>
-        </view>
-        <view class="weui-form-preview__bd">
-            <view class="weui-form-preview__item">
-                <view class="weui-form-preview__label">起始筹码</view>
-                <view class="weui-form-preview__value">{{startChips}}</view>
-            </view>
-        </view>
-        <view class="weui-form-preview__ft">
-            <view bindtap="tapDelete" data-object-id="{{objectId}}" class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active">删除</view>
-            <navigator url="../viewGame/viewGame?objectId={{objectId}}" class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" >查看</navigator>
-        </view>
-    </view>
-</template>
-
 <view class="page">
-    <view class="page__hd">
-        <view class="page__title">比赛列表</view>
-        <view class="page__desc">已经加载{{startIndex}}个比赛</view>
-    </view>
-    <navigator url="../editGame/editGame" class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active">新建比赛</navigator>
-    <view class="page__bd" wx:for="{{games}}" wx:key="id" wx:for-item="game">
-        <template is="gameItem" data="{{...game}}" />
-    </view>
-    <view wx:if="{{hasMore}}" class="weui-loadmore weui-loadmore_line">
-        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">加载更多</view>
-    </view>
-
-    <view wx:if="{{!hasMore}}" class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
-        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"></view>
-    </view>
-    <view wx:if="{{loading}}" class="weui-loadmore">
-        <view class="weui-loading"></view>
-        <view class="weui-loadmore__tips">正在加载</view>
-    </view>
-    <view wx:if="{{!games}}" class="weui-loadmore weui-loadmore_line">
-        <view class="weui-loadmore__tips weui-loadmore__tips_in-line">暂无数据</view>
+    <view class="page__bd page__bd_spacing">
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="primary" bindtap="handleCreateGame" loading="{{saving}}">
+                新建比赛
+            </button>
+        </view>
+        <view class="component__hd">比赛列表</view>
+        <block wx:for="{{gamesForView}}" wx:key="objectId" wx:for-item="game" wx:for-index="idx">
+            <i-swipeout i-class="i-swipeout-item" operateWidth="{{70}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+                <view slot="content" catch:tap="soCotentTapAction" data-game="{{game.objectId}}">
+                    <i-cell i-class="i-cell-padding" title="{{game.title}} / {{game.subTitle}}" label="{{util.formatShortTime(game.startTimeMills)}}"></i-cell>
+                </view>
+                <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
+                    <view class="i-swipeout-button" style="width:70px" bindtap="soDeleteTapAction" data-game="{{game.objectId}}">
+                        <i-icon size="48" type="delete_fill"></i-icon>
+                    </view>
+                </view>
+            </i-swipeout>
+        </block>
+        <i-action-sheet visible="{{ asVisible }}" actions="{{ asActions }}" show-cancel bind:cancel="handleASCancel" bind:click="handleASItemClick" mask-closable="{{ false }}">
+            <view slot="header" style="padding: 16px">
+                <view style="color: #444;font-size: 16px">确定删除比赛[{{soGame.title}}]吗？</view>
+                <text>删除后无法恢复哦</text>
+            </view>
+        </i-action-sheet>
     </view>
 </view>

@@ -1,40 +1,25 @@
-<!-- 这是自定义组件countdown的内部WXML结构 -->
-<view class="component__hd">倒计时</view>
-<view class="weui-form-preview">
-    <!-- <view class="component__hd">倒计时</view> -->
-    <view wx:if="{{status==='before'}}" class="weui-form-preview__hd">
-        <view class="weui-form-preview__label">尚未开始</view>
-        <view class="weui-form-preview__value_in-hd">{{countdown}}</view>
+<i-panel title="比赛详情">
+    <i-cell wx:if="{{status==='before'}}" title="尚未开始" value="{{countdown}}"></i-cell>
+    <block wx:if="{{status==='gaming'}}">
+        <i-cell wx:if="{{breaking}}" title="级别 {{rounds[currentRoundIndex].level}}休息中" value="{{countdown}}"></i-cell>
+        <i-cell wx:if="{{!breaking}}" title="正在进行级别 {{rounds[currentRoundIndex].level}}" value="{{countdown}}"></i-cell>
+    </block>
+    <i-cell wx:if="{{status==='after'}}" title="已经结束" value="{{countdown}}"></i-cell>
+    <i-cell wx:if="{{status==='gaming'}}" title="盲注" value=" {{rounds[currentRoundIndex].smallBlind}}/{{rounds[currentRoundIndex].bigBlind}}"></i-cell>
+    <view class="weui-btn-area">
+        <button wx:if="{{status==='before'}}" class="weui-btn" type="primary" bindtap="tapStartImmediate" loading="{{saving}}">
+            立即开始
+        </button>
+        <block wx:if="{{status==='gaming'}}">
+            <button wx:if="{{game.pauseTime}}" class="weui-btn" type="primary" bindtap="tapResume" loading="{{saving}}">
+                继续
+            </button>
+            <button wx:if="{{!game.pauseTime}}" class="weui-btn" type="primary" bindtap="tapPause" loading="{{saving}}">
+                暂停
+            </button>
+        </block>
+        <button wx:if="{{status==='after'}}" class="weui-btn" type="primary" bindtap="tapStartImmediate" loading="{{saving}}">
+            重新开始
+        </button>
     </view>
-
-    <view wx:if="{{status==='gaming'}}" class="weui-form-preview__hd">
-        <view wx:if="{{breaking}}" class="weui-form-preview__label">级别 {{rounds[currentRoundIndex].level}}休息中</view>
-        <view wx:if="{{!breaking}}" class="weui-form-preview__label">正在进行级别 {{rounds[currentRoundIndex].level}}</view>
-        <view class="weui-form-preview__value_in-hd">{{countdown}}</view>
-    </view>
-
-    <view wx:if="{{status==='after'}}" class="weui-form-preview__hd">
-        <view class="weui-form-preview__label">已经结束</view>
-        <view class="weui-form-preview__value_in-hd">{{countdown}}</view>
-    </view>
-
-    <view wx:if="{{status==='gaming'}}" class="weui-form-preview__bd">
-        <view class="weui-form-preview__item">
-            <view class="weui-form-preview__label">盲注</view>
-            <view class="weui-form-preview__value">{{rounds[currentRoundIndex].smallBlind}}/{{rounds[currentRoundIndex].bigBlind}}</view>
-        </view>
-    </view>
-
-    <view wx:if="{{status==='before'}}" class="weui-form-preview__ft">
-        <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapStartImmediate">立即开始</view>
-    </view>
-
-    <view wx:if="{{status==='gaming'}}" class="weui-form-preview__ft">
-        <view wx:if="{{game.pauseTime}}" class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapResume">继续</view>
-        <view wx:if="{{!game.pauseTime}}" class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapPause">暂停</view>
-    </view>
-
-    <view wx:if="{{status==='after'}}" class="weui-form-preview__ft">
-        <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" bind:tap="tapStartImmediate">重新开始</view>
-    </view>
-</view>
+</i-panel>

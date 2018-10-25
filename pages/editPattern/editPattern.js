@@ -219,10 +219,6 @@ Page({
         let error = null;
         if (!value || value.length === 0) {
             error = "模板名称不能为空"
-        } else if (value.length < 4) {
-            error = "模板名称太短"
-        } else if (value.length > 10) {
-            error = "模板名称太长"
         }
         this.setData({
             title: value,
@@ -359,18 +355,6 @@ Page({
         let pattern = this.data.pattern;
         let rounds = this.data.rounds;
 
-        //把展现用的属性删除 不保存到数据库
-        delete pattern.open;
-        delete pattern.actions;
-        for (let round of rounds) {
-            round.id = undefined;
-            round.actions = undefined;
-            round.open = undefined;
-            delete round.id;
-            delete round.actions;
-            delete round.open;
-        }
-
         pattern.save({ rounds }).then(function (pattern) {
             console.log(`editPattern:_updatePattern::${JSON.stringify(pattern)}`);
             that.setData({
@@ -412,12 +396,35 @@ Page({
 
             //初始化toggles为全部关闭
             let toggles = [];
-            rounds.forEach(pattern => {
+            rounds.forEach(item => {
                 toggles.push(false);
             });
-            that.setData({ pattern, rounds, toggles });
+            that.setData({
+                pattern,
+                patternForView: that._createPatternForView(pattern),
+                rounds,
+                toggles
+            });
         }, function (error) {
             console.error(error);
         })
+    },
+
+    /**
+     * wxml中wx:for如果传Parse Object
+     * 凡是通过object.get('name')来获取的数据都可能为空 还会报Expect FLOW_CREATE_NODE but get another错误
+     * 所以重新生成一patternForView对象，专门用于wxml中显示使用
+     */
+    _createPatternForView: function (pattern) {
+        //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
+        //添加startTimeMills、pauseTimeMills字段，根据startTime、pauseTime的getTime()生成startTimeMills
+        let patternForView = {
+            //id
+            id: pattern.id,
+            objectId: pattern.id,
+            //desc
+            title: pattern.get('title'),
+        };
+        return patternForView;
     }
 })

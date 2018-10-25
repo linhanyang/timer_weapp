@@ -235,10 +235,6 @@ Page({
             case 'title': {
                 if (!value || value.length === 0) {
                     error = "标题不能为空"
-                } else if (value.length < 4) {
-                    error = "标题太短"
-                } else if (value.length > 10) {
-                    error = "标题名称太长"
                 }
                 this.setData({
                     title: value,
@@ -248,10 +244,6 @@ Page({
             case 'subTitle': {
                 if (!value || value.length === 0) {
                     error = "次标题不能为空"
-                } else if (value.length < 4) {
-                    error = "次标题太短"
-                } else if (value.length > 10) {
-                    error = "次标题名称太长"
                 }
                 this.setData({
                     subTitle: value,
