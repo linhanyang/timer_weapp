@@ -8,7 +8,6 @@
         "pages/editPattern/editPattern",
         "pages/editGame/editGame",
         "pages/viewGame/viewGame",
-        "pages/viewGame_/viewGame_",
         "pages/editRound/editRound",
         "pages/editRound4pattern/editRound4pattern",
         "pages/devices/devices",

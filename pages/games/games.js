@@ -84,7 +84,7 @@ Page({
             let objectId = e.currentTarget.dataset.game;
             //跳转到editGame的编辑界面
             wx.navigateTo({
-                url: `../viewGame_/viewGame_?objectId=${objectId}`,
+                url: `../viewGame/viewGame?objectId=${objectId}`,
             })
 
             this.setData({

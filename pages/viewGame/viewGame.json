@@ -1,9 +1,16 @@
 {
     "navigationBarTitleText": "比赛详情",
     "usingComponents": {
-        "countdown": "../../components/countdown/countdown",
         "desc": "../../components/desc/desc",
         "rounds": "../../components/rounds/rounds",
-        "screens": "../../components/screens/screens"
+        "countdown": "../../components/countdown/countdown",
+        "i-swipeout": "../../dist/swipeout/index",
+        "i-cell-group": "../../dist/cell-group/index",
+        "i-cell": "../../dist/cell/index",
+        "i-icon": "../../dist/icon/index",
+        "i-button": "../../dist/button/index",
+        "i-action-sheet": "../../dist/action-sheet/index",
+        "i-panel": "../../dist/panel/index",
+        "i-input-number": "../../dist/input-number/index"
     }
 }
