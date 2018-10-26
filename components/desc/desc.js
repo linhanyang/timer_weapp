@@ -7,7 +7,7 @@ Component({
         game: {
             type: Object,
             value: undefined,
-            observer:'_gameChange'
+            observer: '_gameChange'
         },
 
     },
@@ -48,10 +48,11 @@ Component({
             console.log(`desc:bindActionTap:action:${action} props:${props}`);
             this.triggerEvent('actionTap', { action, props });
         },
+
         handlerChange: function (e) {
             console.log(`desc:handlerChange:action:${JSON.stringify(e)}`);
-
             let props = e.currentTarget.dataset.props;
+            let value = e.detail.value;
             let action;
             switch (e.detail.type) {
                 case 'plus':
@@ -60,19 +61,17 @@ Component({
                 case 'minus':
                     action = 'subtract';
                     break;
+                case undefined:
+                    action = 'change';
                 default:
                     break;
             }
-            console.log(`desc:bindActionTap:action:${action} props:${props}`);
+            console.log(`desc:bindActionTap:action:${action} value:${value} props:${props}`);
             if (action && props)
-                this.triggerEvent('actionTap', { action, props });
+                this.triggerEvent('actionTap', { action, value, props });
         },
         _gameChange(newGame, oldGame) {
-            console.log(`rounds:_gameChange:newGame:${JSON.stringify(newGame)}`);
-            // let rebuy = newGame.rebuy;
-            // let addon = newGame.addon;
-            // this.setData({ rebuy, addon });
-            // this._generateRounds();
+            console.log(`rounds:_gameChange:newGame:${newGame.title}`);
         },
     }
 })

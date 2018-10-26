@@ -7,8 +7,6 @@ App({
 
     onShow: function (options) {
         console.log(`app:onShow:options:${JSON.stringify(options)}`);
-
-
         // Do something when show.
     },
     onHide: function () {
@@ -96,5 +94,4 @@ App({
             }
         })
     }
-
 })

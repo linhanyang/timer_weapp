@@ -7,9 +7,10 @@ Page({
    * 页面的初始数据
    */
   data: {
+    loading: false,
     game: undefined,
     currentRoundIndex: -1,
-    status: ''
+    status: '',
   },
 
   /**
@@ -31,70 +32,43 @@ Page({
     }
   },
 
-  onNumberChange: function (e) {
-    console.log(`desc:onNumberChange:action:${JSON.stringify(e)}`);
-
-    let props = e.currentTarget.dataset.props;//要设置的属性
-    let actionType = e.detail.type;
-    console.log(`desc:onNumberChange:action:${actionType} props:${props}`);
-    if (actionType && props) {
-      switch (actionType) {
-        case 'plus': {
-          //属性加1
-          let value = game.get(props);
-          if (value)
-            value = value + 1;
-          else
-            value = 1;
-          game.set(props, value);
-        }
-          break;
-        case 'minus': {
-          //属性减1
-          let value = game.get(props);
-          if (value)
-            value = value - 1;
-          else
-            value = 0;
-          if (value < 0)
-            value = 0;
-          game.set(props, value);
-        }
-          break;
-        default:
-          break;
-      }
-
-
-      //更新game
-      this._updateGame(game);
-    }
-  },
   /**
   * 添加或减少rebuy次数 addon次数 玩家人数
   */
   onActionTap: function (e) {
     let action = e.detail.action;
     let props = e.detail.props;
+    let value = e.detail.value;
 
-    console.log(`viewGame_:onActionTap:action:${action} props:${props}`);
+    console.log(`viewGame_:onActionTap:action:${action} value:${value} props:${props}`);
     let game = this.data.game;
-    if ('subtract' === action) {
-      let value = game.get(props);
-      if (value)
-        value = value - 1;
-      else
-        value = 0;
-      if (value < 0)
-        value = 0;
-      game.set(props, value);
-    } else if ('add' === action) {
-      let value = game.get(props);
-      if (value)
-        value = value + 1;
-      else
-        value = 1;
-      game.set(props, value);
+    switch (action) {
+      case 'subtract': {
+        let value = game.get(props);
+        if (value)
+          value = value - 1;
+        else
+          value = 0;
+        if (value < 0)
+          value = 0;
+        game.set(props, value);
+      }
+        break;
+      case 'subtract': {
+        let value = game.get(props);
+        if (value)
+          value = value + 1;
+        else
+          value = 1;
+        game.set(props, value);
+      }
+        break;
+      case 'change': {
+        game.set(props, value);
+      }
+        break;
+      default:
+        break;
     }
     //更新game
     this._updateGame(game);
@@ -244,7 +218,7 @@ Page({
       query.equalTo('objectId', game.id);
       sgame = query.subscribe();
       sgame.on('open', () => {
-        console.log(`viewGame_:sgame:opened:${JSON.stringify(sgame)}`);
+        console.log(`viewGame_:sgame:opened:`);
       });
       sgame.on('update', (game) => {
         console.log(`viewGame_:sgame updated1:${game && game.get('title')}`);
@@ -267,18 +241,20 @@ Page({
    */
   _fetchGame: function (objectId) {
     console.log(`viewGame_:_fetchGame:objectId:${objectId}`);
+    
+    this.setData({ loading: true });
     let that = this;
     let query = new Parse.Query(Game);
     query.get(objectId).then(function (game) {
-      console.log(`viewGame_:_fetchGame:game:${JSON.stringify(game)}`);
-
-      that.setData({ game, gameForView: that._createGameForView(game) }, function () {
+      console.log(`viewGame_:_fetchGame:game:${game && game.get('title')}`);
+      that.setData({ game, gameForView: that._createGameForView(game), loading: false }, function () {
         console.log(`viewGame_:_fetchGame:setDataFinished:game:startTime:${game.get('startTimeMills')}`);
         this._subscribeGame();
       });
-    }, function (error) {
+    }).catch(function (error) {
+      that.setData({ loading: false });
       console.error(error);
-    })
+    });
   },
 
   /**

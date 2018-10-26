@@ -8,9 +8,9 @@ Page({
      * 页面的初始数据
      */
     data: {
+        loading: false,
         games: [],
         //右滑相关
-        // toggle: false,//右滑开关
         toggles: [],//左滑开关
         oldExpanded: false,//右滑是否打开
         nextExpanded: false,
@@ -145,8 +145,6 @@ Page({
             //不在转圈
             actions[index].loading = false;
             that.setData({
-                // games,
-                // toggles,
                 asVisible: false,
                 soGame: null,
                 asActions: actions,
@@ -158,7 +156,6 @@ Page({
                 asVisible: false,
                 soGame: null,
                 asActions: actions,
-                // toggle: that.data.toggle ? false : true
             });
             that._closeAllSwipeout();
         });
@@ -297,6 +294,7 @@ Page({
      * 获取game列表
      */
     _fetchGames: function () {
+        this.setData({ loading: true });
         let that = this;
         console.log(`games:_fetchGames`);
         let query = new Parse.Query(Game);
@@ -309,6 +307,7 @@ Page({
                 toggles.push(false);
             });
             that.setData({
+                loading: false,
                 games,
                 gamesForView: that._createGamesForView(games),
                 needReload: false,
