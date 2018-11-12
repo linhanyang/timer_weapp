@@ -33,7 +33,7 @@ Page({
         if (Parse.User.current()) {
             console.log(`games:onLoad:currentUser:${Parse.User.current().get('username')}`)
             this._fetchGames();
-            this._liveQuery();
+            this._subscribeGames();
         } else {
             console.log(`games:onLoad:currentUser is null`)
             let app = getApp();
@@ -41,7 +41,7 @@ Page({
             app.userReadyCallback = res => {
                 console.log(`games:onLoad:userReadyCallback:${Parse.User.current().get('username')}`)
                 that._fetchGames();
-                that._liveQuery();
+                that._subscribeGames();
             }
         }
     },
@@ -55,6 +55,10 @@ Page({
         }
     },
 
+
+    onPullDownRefresh: function () {
+        this._fetchGames();
+    },
 
 
     /**
@@ -166,7 +170,7 @@ Page({
      */
     soDeleteTapAction: function (e) {
         let objectId = e.currentTarget.dataset.game;
-        console.log(`games:soDeleteTapAction:objectId:${JSON.stringify(objectId)}`);
+        console.log(`games:soDeleteTapAction:objectId:${objectId}`);
         //找
         let game = this.data.games.find(function (value) {
             return value.id === objectId;
@@ -201,80 +205,6 @@ Page({
         this.setData({ toggles });
     },
 
-    _liveQuery: function () {
-        let that = this;
-        let query = new Parse.Query('Game');
-        query.select(['title', 'startTime', 'subTitle'])
-        sgames = query.subscribe();
-        sgames.on('open', () => {
-            console.log(`games:sgames:opened`);
-        });
-        sgames.on('create', (game) => {
-            console.log(`games:sgames created:${JSON.stringify(game.get('title'))}`);
-            //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
-            //添加startTimeMills字段，根据startTime的getTime()生成startTimeMills 
-            game.set('startTimeMills', game.get('startTime').getTime());
-            let games = that.data.games;
-            let index = games.findIndex(function (value, index, arr) {
-                return value.id === game.id;
-            });
-            //如果没有 说明还没有添加 添加进来
-            if (index == -1) {
-                games = [game, ...games];
-                //toggles也要添加
-                let toggles = that.data.toggles;
-                toggles = [false, ...toggles];
-                that.setData({
-                    games,
-                    gamesForView: that._createGamesForView(games),
-                    toggles,
-                })
-            }
-        });
-        sgames.on('update', (game) => {
-            console.log(`games:sgames updated1:${JSON.stringify(game.get('title'))}`);
-            //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
-            //添加startTimeMills字段，根据startTime的getTime()生成startTimeMills 
-            game.set('startTimeMills', game.get('startTime').getTime());
-            let games = that.data.games;
-            let index = games.findIndex(function (value) {
-                return value.id === game.id;
-            });
-            if (index != -1) {
-                console.log(`game:SGAMES_UPDATED:game:${game.get('title')}`);
-                games.splice(index, 1, game);
-                that.setData({
-                    games,
-                    gamesForView: that._createGamesForView(games),
-                });
-            }
-        });
-        sgames.on('delete', (game) => {
-            console.log(`games:sgames:deleted:${game.get('title')}`);
-            let games = that.data.games;
-            //获取被删除game的索引
-            let index = games.findIndex(function (value, index, arr) {
-                return value.id === game.id;
-            });
-            if (index != -1) {
-                //从games中删除
-                games.splice(index, 1);
-                //toggles也要添加
-                let toggles = that.data.toggles;
-                toggles.splice(index, 1);
-                that.setData({
-                    games,
-                    gamesForView: that._createGamesForView(games),
-                    toggles,
-                });
-            }
-        });
-
-        sgames.on('close', () => {
-            console.log('games:sgames:closed');
-        });
-    },
-
     /**
      * wxml中wx:for如果传Parse Object
      * 凡是通过object.get('name')来获取的数据都可能为空 还会报Expect FLOW_CREATE_NODE but get another错误
@@ -285,7 +215,7 @@ Page({
         games.forEach(item => {
             //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
             //添加startTimeMills字段，根据startTime的getTime()生成startTimeMills 
-            gamesForView.push({ objectId: item.id, id: item.id, title: item.get('title'), subTitle: item.get('subTitle'), startTime: item.get('startTime'), startTimeMills: item.get('startTime').getTime() })
+            gamesForView.push({ objectId: item.id, id: item.id, title: item.get('title'), startTime: item.get('startTime'), startTimeMills: item.get('startTime').getTime() })
         });
         return gamesForView;
     },
@@ -298,14 +228,18 @@ Page({
         let that = this;
         console.log(`games:_fetchGames`);
         let query = new Parse.Query(Game);
-        query.select(['title', 'startTime', 'subTitle'])
+        query.select(['title', 'startTime'])
         query.find().then(function (games) {
-            console.log(`games:_fetchGames:games:${JSON.stringify(games)}`);
+            console.log(`games:_fetchGames:games:${games && games.length}`);
+
             ///初始化toggles为全部关闭
             let toggles = [];
             games.forEach(item => {
                 toggles.push(false);
             });
+
+            //关闭下拉刷新的动画
+            wx.stopPullDownRefresh()
             that.setData({
                 loading: false,
                 games,
@@ -313,6 +247,41 @@ Page({
                 needReload: false,
                 toggles
             });
+        });
+    },
+    /**
+     * 监听比赛
+     * 主要用于删除新建等操作更新界面
+     * 还用于共享权限时其它用户新建删除更新等操作
+     */
+    _subscribeGames: function () {
+        
+        if (sgames) {
+            sgames.unsubscribe();
+            sgames = null;
+        }
+        let that = this;
+        let query = new Parse.Query('Game');
+        query.select(['title', 'startTime'])
+        sgames = query.subscribe();
+        sgames.on('open', () => {
+            console.log(`games:sgames:opened`);
+        });
+        sgames.on('create', (game) => {
+            console.log(`games:sgames created:${game && game.get('title')}`);
+            that._fetchGames();
+        });
+        sgames.on('update', (game) => {
+            console.log(`games:sgames updated1:${game && game.get('title')}`);
+            that._fetchGames();
+        });
+        sgames.on('delete', (game) => {
+            console.log(`games:sgames:deleted:${game && game.get('title')}`);
+            that._fetchGames();
+        });
+
+        sgames.on('close', () => {
+            console.log('games:sgames:closed');
         });
     }
 })

@@ -26,7 +26,7 @@ Component({
         },
         operateWidth: {
             type: Number,
-            value: 160
+            value: 160,
         }
     },
     options: {
@@ -126,7 +126,7 @@ Component({
                     pageY: touches.pageY - start.pageY
                 }
                 let nextExpanded = false;
-                if (Math.abs(spacing.pageX) >= 40 && direction === "Left") {
+                if (Math.abs(spacing.pageX) >= 60 && direction === "Left") {
                     spacing.pageX = spacing.pageX < 0 ? - this.data.limitMove : this.data.limitMove;
                     nextExpanded = true;
                 } else {

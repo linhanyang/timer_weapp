@@ -1,6 +1,7 @@
 // pages/patterns/patterns.js
 let Parse = require('../../parse');
 let Pattern = Parse.Object.extend("Pattern");
+let sPatterns;
 Page({
     /**
      * 页面的初始数据
@@ -29,6 +30,7 @@ Page({
      */
     onLoad: function (options) {
         this._fetchPatterns();
+        this._subscribePatterns();
     },
 
     /**
@@ -45,8 +47,15 @@ Page({
      * 生命周期函数--监听页面卸载
      */
     onUnload: function () {
-
+        if (sPatterns) {
+            sPatterns.unsubscribe();
+        }
     },
+
+    onPullDownRefresh: function () {
+        this._fetchPatterns();
+    },
+
 
     /**
      * 新建按钮事件
@@ -171,7 +180,7 @@ Page({
      */
     soDeleteTapAction: function (e) {
         let objectId = e.currentTarget.dataset.pattern;
-        console.log(`patterns:soDeleteTapAction:objectId:${JSON.stringify(objectId)}`);
+        console.log(`patterns:soDeleteTapAction:objectId:${objectId}`);
         //找
         let pattern = this.data.patterns.find(function (value) {
             return value.id === objectId;
@@ -218,13 +227,15 @@ Page({
         query.descending('createdAt');
         query.include('rounds');
         query.find().then(function (patterns) {
-            console.log(`patterns:_fetchPatterns:patterns:${JSON.stringify(patterns)}`);
+            console.log(`patterns:_fetchPatterns:patterns:${patterns && patterns.length}`);
             //初始化toggles为全部关闭
             let toggles = [];
             patterns.forEach(pattern => {
                 toggles.push(false);
             });
 
+            //关闭下拉刷新的动画
+            wx.stopPullDownRefresh()
             that.setData({
                 patterns,
                 patternsForView: that._createPatternsForView(patterns),
@@ -246,5 +257,35 @@ Page({
         });
         return patternsForView;
     },
-
+    /**
+     * 监听curRole下的大屏幕状态
+     * 主要是在绑定或解绑时更新界面
+     */
+    _subscribePatterns: function () {
+        if (sPatterns) {
+            sPatterns.unsubscribe();
+            sPatterns = null;
+        }
+        let that = this;
+        let query = new Parse.Query(Pattern);
+        sPatterns = query.subscribe();
+        sPatterns.on('open', () => {
+            console.log(`patterns:sPatterns:opened`);
+        });
+        sPatterns.on('create', (game) => {
+            console.log(`patterns:sPatterns:create`);
+            that._fetchPatterns();
+        });
+        sPatterns.on('update', (game) => {
+            console.log(`patterns:sPatterns:update`);
+            that._fetchPatterns();
+        });
+        sPatterns.on('delete', (game) => {
+            console.log(`patterns:sPatterns:delete`);
+            that._fetchPatterns();
+        });
+        sPatterns.on('close', () => {
+            console.log('patterns:sPatterns:closed');
+        });
+    },
 })

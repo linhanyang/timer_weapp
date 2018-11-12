@@ -1,21 +1,13 @@
 <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
     <view class="page__bd">
-        <view class="weui-cells__title">请输入详情</view>
+        <view class="weui-cells__title">请输入标题</view>
         <view class="weui-cells weui-cells_after-title">
-            <view class="weui-cell">
-                <view class="weui-cell__hd">
-                    <view class="weui-label">屏幕ID</view>
-                </view>
-                <view class="weui-cell__bd">
-                    <view class="weui-label">{{deviceRole.uuid}}</view>
-                </view>
-            </view>
             <view class="weui-cell weui-cell_input {{titleError ? 'weui-cell_warn' : ''}}">
                 <view class="weui-cell__hd">
-                    <view class="weui-label">屏幕名称</view>
+                    <view class="weui-label">标题</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="title" auto-focus class="weui-input" placeholder="请输入屏幕名称" value="{{deviceRole.title}}" bindblur="bindTitleBlur" />
+                    <input id="title" auto-focus class="weui-input" placeholder="请输入标题" value="{{role.title}}" bindblur="bindTitleBlur" />
                 </view>
                 <view wx:if="{{titleError}}" class="weui-cell__ft">
                     <icon id="title" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>

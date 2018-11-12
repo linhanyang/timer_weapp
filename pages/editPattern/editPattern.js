@@ -111,7 +111,7 @@ Page({
         let old = e.detail.oldValue;
         let next = e.detail.nextValue;
         let index = e.currentTarget.dataset.index;
-        console.log(`editPattern:onExpandedChange:old:${old} next:${next} toggles:${this.data.toggles}`);
+        console.log(`rounds:onExpandedChange:old:${old} next:${next} index:${index}`);
         this.setData({ oldExpanded: old, nextExpaned: next });
         if (old == false && next == true) {
             this._closeAllSwipeoutExcept(index);
@@ -356,7 +356,7 @@ Page({
         let rounds = this.data.rounds;
 
         pattern.save({ rounds }).then(function (pattern) {
-            console.log(`editPattern:_updatePattern::${JSON.stringify(pattern)}`);
+            console.log(`editPattern:_updatePattern::${pattern && pattern.get('title')}`);
             that.setData({
                 saving: false,
             });

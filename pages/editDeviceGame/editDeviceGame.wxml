@@ -7,7 +7,7 @@
                     <view class="weui-label">屏幕ID</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <view class="weui-label">{{deviceUser.uuid}}</view>
+                    <view class="weui-label">{{deviceRole.uuid}}</view>
                 </view>
             </view>
             <view class="weui-cell">
@@ -15,12 +15,10 @@
                     <view class="weui-label">屏幕名称</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <view class="weui-label">{{deviceUser.title}}</view>
+                    <view class="weui-label">{{deviceRole.title}}</view>
                 </view>
             </view>
         </view>
-
-        
         <view class="weui-cells__title">请选择比赛</view>
         <view class="weui-cells weui-cells_after-title">
             <view class="weui-cell weui-cell_input {{gameError ? 'weui-cell_warn' : ''}}">
@@ -37,9 +35,23 @@
                 </view>
             </view>
         </view>
-
+        <view class="weui-cells__title">请选择屏幕模板</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_input}}">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">模板</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker bindchange="bindTypeChange" value="{{typeIndex}}" range="{{types}}" range-key="lbl">
+                        <input id="type" disabled class="weui-input" placeholder="请选择比赛" value="{{types[typeIndex].lbl}}"></input>
+                    </picker>
+                </view>
+            </view>
+        </view>
         <view class="weui-btn-area">
-            <button class="weui-btn" type="primary" bindtap="bindSubmitTap" loading="{{saving}}">确定</button>
+            <button class="weui-btn" type="primary" bindtap="bindSubmitTap" loading="{{saving}}">
+                确定
+            </button>
         </view>
     </view>
 </view>

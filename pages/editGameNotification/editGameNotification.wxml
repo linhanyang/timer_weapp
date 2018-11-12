@@ -1,0 +1,15 @@
+<view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+    <view class="page__bd">
+        <view class="weui-cells__title">请输入通知</view>
+        <form bindsubmit="bindFormSubmit">
+            <view class="textarea-wrp">
+                <textarea placeholder="一行一条记录。请换行。" auto-focus="{{true}}" name="notification" value="{{game.notification}}"  maxlength="{{-1}}"/>
+            </view>
+            <view class="weui-btn-area">
+                <button class="weui-btn" type="primary" form-type="submit">
+                    确定
+                </button>
+            </view>
+        </form>
+    </view>
+</view>

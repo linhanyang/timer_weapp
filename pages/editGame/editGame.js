@@ -10,15 +10,16 @@ Page({
         patternIndex: -1,
         date: '',
         time: '',
-        title: '',
-        subTitle: '',
+        title: 'Hulu计时',
         startTime: 0,
-        startChips: 0,
+        startChips: 1000,
         rebuy: false,
         rebuyChips: 0,
         addon: false,
         addonChips: 0,
-        players: 0,
+        players: 100,
+        restPlayers: 100,
+        rewardPlayers: 10,
         rounds: [],
         saving: false,
     },
@@ -159,7 +160,6 @@ Page({
     _saveGame: function () {
         let that = this;
         let title = this.data.title;
-        let subTitle = this.data.subTitle;
         let startChips = this.data.startChips;
 
         let rebuy = this.data.rebuy;
@@ -181,7 +181,6 @@ Page({
 
         let game = new Game();
         game.set('title', title);
-        game.set('subTitle', subTitle);
         game.set('startChips', parseInt(startChips));
         game.set('startTime', startTime);
         game.set('rebuy', rebuy);
@@ -210,6 +209,7 @@ Page({
             gameAcl.setRoleReadAccess(curRole, true);
             gameAcl.setRoleWriteAccess(curRole, true);
             game.set('ACL', gameAcl);
+            game.set('role', curRole);
             return game.save();
         }).then(function (game) {
             console.log(`editGame:_saveGame:game:${game.id}`);
@@ -239,15 +239,6 @@ Page({
                 this.setData({
                     title: value,
                     titleError: error,
-                })
-            } break;
-            case 'subTitle': {
-                if (!value || value.length === 0) {
-                    error = "次标题不能为空"
-                }
-                this.setData({
-                    subTitle: value,
-                    subTitleError: error,
                 })
             } break;
             case 'startChips': {
@@ -326,10 +317,8 @@ Page({
 
         //验证输入框
         let title = this.data.title;
-        let subTitle = this.data.subTitle;
         let startChips = this.data.startChips;
         this._validateInput('title', title);
-        this._validateInput('subTitle', subTitle);
         this._validateInput('startChips', startChips);
 
         let rebuy = this.data.rebuy;

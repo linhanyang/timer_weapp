@@ -1,7 +1,7 @@
 <!-- 这是自定义组件desc的内部WXML结构 -->
 <wxs src="../../utils/util.wxs" module="util" />
 <i-panel title="比赛详情">
-    <i-cell title="{{game.title}}" value="{{game.subTitle}}"></i-cell>
+    <i-cell title="比赛名称" value="{{game.title}}" ></i-cell>
     <i-cell title="开始时间" value="{{util.formatShortTime(game.startTimeMills)}}"></i-cell>
     <i-cell title="起始筹码" value="{{game.startChips}}$"></i-cell>
     <i-cell wx:if="{{game.rebuy}}" title="重买筹码" value="{{game.rebuyChips}}$"></i-cell>

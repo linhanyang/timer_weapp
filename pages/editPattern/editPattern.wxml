@@ -19,14 +19,14 @@
         <view wx:if="{{!rounds||rounds.length===0}}" class="weui-cells__title">
             盲注列表为空，请用【追加级别】添加。
         </view>
-        <block wx:for="{{rounds}}" wx:key="objectId" wx:for-item="round" wx:for-index="idx">
+        <block wx:for="{{rounds}}" wx:key="level" wx:for-item="round" wx:for-index="idx">
             <i-swipeout i-class="i-swipeout-item" operateWidth="{{60}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" actions="{{soActions}}" 
             data-round-level="{{round.level}}" bindchange="handlerSoChange" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
                 <view slot="content" bindtap="handlerSoCotentTap" data-round-level="{{round.level}}">
                     <i-cell  wx:if="{{round.breakDuration && round.breakDuration !== 0}}" i-class="i-cell-padding">
                         级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟 休息{{round.breakDuration}}分钟
                     </i-cell >
-                    <i-cell iew wx:if="{{!round.breakDuration || round.breakDuration === 0}}" i-class="i-cell-padding">
+                    <i-cell iew wx:else i-class="i-cell-padding">
                         级别{{round.level}} {{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟
                     </i-cell >
                 </view>

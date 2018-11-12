@@ -7,16 +7,16 @@
             </button>
         </view>
         <view class="component__hd">屏幕列表</view>
-        <block wx:for="{{deviceUsersForView}}" wx:key="objectId" wx:for-item="deviceUser" wx:for-index="idx">
+        <block wx:for="{{deviceRolesForView}}" wx:key="objectId" wx:for-item="deviceRole" wx:for-index="idx">
             <i-swipeout i-class="i-swipeout-item" operateWidth="{{120}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
-                <view slot="content" catch:tap="soCotentTapAction" data-device-user="{{deviceUser.objectId}}">
-                    <i-cell i-class="i-cell-padding" title="{{deviceUser.title}}" label="{{deviceUser.label}}"></i-cell>
+                <view slot="content" catch:tap="soCotentTapAction" data-device-role="{{deviceRole.objectId}}">
+                    <i-cell i-class="i-cell-padding" title="{{deviceRole.title}}" label="{{deviceRole.label}}"></i-cell>
                 </view>
                 <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
-                    <view class="i-swipeout-button" style="width:60px" bind:tap="soItemTapAction" data-action="name" data-device-user="{{deviceUser.objectId}}">
+                    <view class="i-swipeout-button" style="width:60px" bind:tap="soItemTapAction" data-action="name" data-device-role="{{deviceRole.objectId}}">
                         <i-icon size="48" type="editor"></i-icon>
                     </view>
-                    <view class="i-swipeout-button" style="width:60px" bind:tap="soItemTapAction" data-action="delete" data-device-user="{{deviceUser.objectId}}">
+                    <view class="i-swipeout-button" style="width:60px" bind:tap="soItemTapAction" data-action="delete" data-device-role="{{deviceRole.objectId}}">
                         <i-icon size="48" type="delete_fill"></i-icon>
                     </view>
                 </view>

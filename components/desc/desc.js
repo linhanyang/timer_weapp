@@ -22,11 +22,11 @@ Component({
         // 生命周期函数，可以为函数，或一个在methods段中定义的方法名
         attached: function () {
 
-            console.log(`desc:attached:game:${JSON.stringify(this.properties.game)}`);
+            console.log(`desc:attached:game:${this.properties.game && this.properties.game.title}`);
         },
         ready: function () {
 
-            console.log(`desc:ready:game:${JSON.stringify(this.properties.game)}`);
+            console.log(`desc:ready:game:${this.properties.game && this.properties.game.title}}`);
         },
         moved: function () {
 

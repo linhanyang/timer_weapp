@@ -1,7 +1,6 @@
 <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
     <view class="page__bd">
         <view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">错误提示</view>
-
         <view class="weui-cells__title">请输入比赛信息</view>
         <view class="weui-cells weui-cells_after-title">
             <view class="weui-cell weui-cell_input {{titleError ? 'weui-cell_warn' : ''}}">
@@ -9,31 +8,18 @@
                     <view class="weui-label">主标题</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="title" auto-focus class="weui-input" placeholder="请输入主标题" bindblur="bindBlur" />
+                    <input id="title" auto-focus class="weui-input" placeholder="请输入标题" bindblur="bindBlur" value="Hulu计时" />
                 </view>
                 <view wx:if="{{titleError}}" class="weui-cell__ft">
                     <icon id="title" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>
                 </view>
             </view>
-
-            <view class="weui-cell weui-cell_input {{subTitleError ? 'weui-cell_warn' : ''}}">
-                <view class="weui-cell__hd">
-                    <view class="weui-label">次标题</view>
-                </view>
-                <view class="weui-cell__bd">
-                    <input id="subTitle" class="weui-input" placeholder="请输入次标题" bindblur="bindBlur" />
-                </view>
-                <view wx:if="{{subTitleError}}" class="weui-cell__ft">
-                    <icon id="subTitle" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>
-                </view>
-            </view>
-
             <view class="weui-cell weui-cell_input {{startChipsError ? 'weui-cell_warn' : ''}}">
                 <view class="weui-cell__hd">
                     <view class="weui-label">起始筹码</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="startChips" type="number" class="weui-input" placeholder="请输入起始筹码" bindblur="bindBlur" />
+                    <input id="startChips" type="number" class="weui-input" placeholder="请输入起始筹码" bindblur="bindBlur" value="1000" />
                 </view>
                 <view class="weui-cell__ft">
                     <view class="weui-label">￥</view>
@@ -47,7 +33,7 @@
                     <view class="weui-label">重买</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input disabled="{{!rebuy}}" id="rebuyChips" type="number" class="weui-input" placeholder="{{rebuy?'请输入重买筹码':''}} " bindblur="bindBlur" />
+                    <input disabled="{{!rebuy}}" id="rebuyChips" type="number" class="weui-input" placeholder="{{rebuy ? '请输入重买筹码' : ''}}" bindblur="bindBlur" value="{{rebuy ? '1000' : ''}}" />
                 </view>
                 <view wx:if="{{rebuy}}" class="weui-cell__ft">
                     <view class="weui-label">￥</view>
@@ -64,7 +50,7 @@
                     <view class="weui-label">加买</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input disabled="{{!addon}}" id="addonChips" type="number" class="weui-input" placeholder="{{addon?'请输入加买筹码':''}} " bindblur="bindBlur" />
+                    <input disabled="{{!addon}}" id="addonChips" type="number" class="weui-input" placeholder="{{addon ? '请输入加买筹码' : ''}}" bindblur="bindBlur" value="{{addon ? '1000' : ''}}" />
                 </view>
                 <view wx:if="{{addon}}" class="weui-cell__ft">
                     <view class="weui-label">￥</view>
@@ -81,7 +67,7 @@
                     <view class="weui-label">玩家</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="players" type="number" class="weui-input" placeholder="请输入玩家人数" bindblur="bindBlur" />
+                    <input id="players" type="number" class="weui-input" placeholder="请输入玩家人数" bindblur="bindBlur" value="100" />
                 </view>
                 <view class="weui-cell__ft">
                     <view class="weui-label">人</view>
@@ -95,7 +81,7 @@
                     <view class="weui-label">剩余玩家</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="restPlayers" type="number" class="weui-input" placeholder="请输入剩余玩家人数" bindblur="bindBlur" />
+                    <input id="restPlayers" type="number" class="weui-input" placeholder="请输入剩余玩家人数" bindblur="bindBlur" value="100" />
                 </view>
                 <view class="weui-cell__ft">
                     <view class="weui-label">人</view>
@@ -109,7 +95,7 @@
                     <view class="weui-label">奖励人数</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="rewardPlayers" type="number" class="weui-input" placeholder="请输入奖励人数" bindblur="bindBlur" />
+                    <input id="rewardPlayers" type="number" class="weui-input" placeholder="请输入奖励人数" bindblur="bindBlur" value="10" />
                 </view>
                 <view class="weui-cell__ft">
                     <view class="weui-label">人</view>
@@ -118,7 +104,6 @@
                     <icon id="rewardPlayers" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>
                 </view>
             </view>
-
             <view class="weui-cell weui-cell_input">
                 <view class="weui-cell__hd">
                     <view class="weui-label">日期</view>
@@ -140,7 +125,6 @@
                 </view>
             </view>
         </view>
-
         <view class="weui-cells__title">请选择盲注模板</view>
         <view class="weui-cells weui-cells_after-title">
             <view class="weui-cell weui-cell_input {{patternError ? 'weui-cell_warn' : ''}}">
@@ -157,9 +141,10 @@
                 </view>
             </view>
         </view>
-
         <view class="weui-btn-area">
-            <button class="weui-btn" type="primary" bindtap="bindSubmitTap" loading="{{saving}}">确定</button>
+            <button class="weui-btn" type="primary" bindtap="bindSubmitTap" loading="{{saving}}">
+                确定
+            </button>
         </view>
     </view>
 </view>

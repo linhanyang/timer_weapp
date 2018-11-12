@@ -93,7 +93,7 @@ Page({
         //这两个属性不需要保存到服务器
         game.save({ rounds })
             .then(function (game) {
-                console.log(`editRround:_updateGame::${JSON.stringify(game)}`);
+                console.log(`editRround:_updateGame::${game && game.get('title')}`);
                 wx.navigateBack({
                     delta: 1
                 });

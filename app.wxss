@@ -1,6 +1,6 @@
 /**app.wxss**/
-@import 'style/weui.wxss';
 
+@import 'style/weui.wxss';
 .container {
     height: 100%;
     display: flex;
@@ -11,11 +11,11 @@
     box-sizing: border-box;
 }
 
-page {
+/* page {
     background-color: #f8f8f8;
     font-size: 16px;
     font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
-}
+} */
 
 .page__hd {
     padding: 40px;
@@ -61,30 +61,38 @@ page {
     position: relative;
 }
 
-
-.i-swipeout-item{
-    border-bottom:rgb(19, 12, 12) solid 1px;
+.i-swipeout-item {
+    border-bottom: rgb(19, 12, 12) solid 1px;
 }
 
-.i-cell-padding{
-    padding:5px 0px!important;
-    font-size:14px;
+.i-cell-padding {
+    padding: 5px 0px !important;
+    font-size: 14px;
 }
 
-
-.i-swipeout-button-group{
-    height:100%;
-    width:100%;
+.i-swipeout-button-group {
+    height: 100%;
+    width: 100%;
 }
 
-
-.i-swipeout-button{
-    width:60px;
-    float:left;
+.i-swipeout-button {
+    width: 60px;
+    float: left;
     display: flex;
-    height:100%;
+    height: 100%;
     justify-content: center;
-    background:#2d8cf0;
-    color:#fff;
-    align-items:center;
+    background: #2d8cf0;
+    color: #fff;
+    align-items: center;
+}
+
+page {
+    background-color: #F8F8F8;
+    height: 100%;
+    font-size: 32rpx;
+    line-height: 1.6;
+}
+
+.page-body {
+    padding: 20rpx 0;
 }

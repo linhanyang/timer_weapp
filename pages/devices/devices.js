@@ -1,24 +1,22 @@
 // pages/devices/devices.js
 let Parse = require('../../parse');
-let DeviceUser = Parse.Object.extend("DeviceUser");
-let Game = Parse.Object.extend("Game");
+let DeviceRole = Parse.Object.extend("DeviceRole");
+let sDeviceRoles;
 Page({
 
     /**
      * 页面的初始数据
      */
     data: {
-
-        gameIndex: -1,
         loading: false,
-        deviceUsers: [],
+        deviceRoles: [],
         needReload: false,//子page返回时 重新加载数据 
 
         //左滑开关
         toggles: [],
         oldExpanded: false,//右滑是否打开
         nextExpanded: false,
-        soDeviceUser: null,//正在右滑的deviceUser
+        soDeviceRole: null,//正在右滑的deviceRole
         //ActionSheet相关
         asVisible: false,
         asContent: '',
@@ -34,23 +32,29 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: function (options) {
-        this._fetchDeviceUsers();
+        this._fetchDeviceRoles();
+        this._subscribeDeviceRole();
     },
     /**
          * 生命周期函数--监听页面显示
          */
     onShow: function () {
         if (this.data.needReload) {
-            this._fetchDeviceUsers();
-            // this.setData({ needReload: false });
+            this._fetchDeviceRoles();
+            this.setData({ needReload: false });
         }
+    },
+    onPullDownRefresh: function () {
+        this._fetchDeviceRoles();
     },
 
     /**
      * 生命周期函数--监听页面卸载
      */
     onUnload: function () {
-
+        if (sDeviceRoles) {
+            sDeviceRoles.unsubscribe();
+        }
     },
     /**
      * 扫描添加屏幕
@@ -61,7 +65,7 @@ Page({
             success: (res) => {
                 console.log(`devices:bindScanTap:uuid:${res.result}`);
                 let uuid = res.result;
-                that._bindDeviceToUser(uuid)
+                that._bindDeviceToRole(uuid)
             }
         })
     },
@@ -80,16 +84,16 @@ Page({
         //swipeout在touchend中通过前两个方法中产生的数据计算当前操作是展开还是关半，因此expanded状态的值也是在touchend中改变的
         //因此只有oldExpanded和nextExpanded都为false时，才能说明这个swipeout是真正关闭的，才能跳转
         if (oldExpanded == false && nextExpanded == false) {
-            let objectId = e.currentTarget.dataset.deviceUser;
+            let objectId = e.currentTarget.dataset.deviceRole;
             //跳转到editDeviceGame
             wx.navigateTo({
-                url: `../editDeviceGame/editDeviceGame?deviceUserId=${objectId}`,
+                url: `../editDeviceGame/editDeviceGame?deviceRoleId=${objectId}`,
             })
 
             this.setData({
                 asVisible: false,
                 asContent: '',
-                soDeviceUser: null,
+                soDeviceRole: null,
             });
 
             this._closeAllSwipeout();
@@ -119,7 +123,7 @@ Page({
         this.setData({
             asVisible: false,
             asContent: '',
-            soDeviceUser: null,
+            soDeviceRole: null,
         });
         this._closeAllSwipeout();
     },
@@ -139,29 +143,33 @@ Page({
             asActions: actions
         });
 
-        let deviceUser = this.data.soDeviceUser;
-        let device = deviceUser.get('device');
+        let deviceRole = this.data.soDeviceRole;
+        let device = deviceRole.get('device');
         let that = this;
-        this._unbindDeviceToUser(device.get('uuid')).then(function (deviceUser) {
+        this._unbindDeviceToRole(device.get('uuid')).then(function (deviceRole) {
             //不在转圈
             actions[index].loading = false;
             that.setData({
                 asVisible: false,
                 asContent: '',
-                soDeviceUser: null,
+                soDeviceRole: null,
                 asActions: actions,
             });
-            that._fetchDeviceUsers();
+            //如果解绑成功通过监听更新界面  不需要再重新获取
+            // that._fetchDeviceRoles();
         }).catch(function (error) {
             //不在转圈
             actions[index].loading = false;
             that.setData({
                 asVisible: false,
                 asContent: '',
-                soDeviceUser: null,
+                soDeviceRole: null,
                 asActions: actions,
             });
             that._closeAllSwipeout();
+
+            console.log(`devices: handleASItemClick:_bindDeviceToRole:error:${error}`);
+            wx.showModal({ content: error, showCancel: false, confirmText: `我知道了` });
         });
     },
 
@@ -170,17 +178,17 @@ Page({
      */
     soItemTapAction: function (e) {
         let action = e.currentTarget.dataset.action;
-        let objectId = e.currentTarget.dataset.deviceUser;
-        console.log(`devices:soItemTapAction:action:${JSON.stringify(action)} objectId:${JSON.stringify(objectId)}`);
+        let objectId = e.currentTarget.dataset.deviceRole;
+        console.log(`devices:soItemTapAction:action:${action} objectId:${objectId}`);
         switch (action) {
             case 'delete':
                 //找
-                let deviceUser = this.data.deviceUsers.find(function (value) {
+                let deviceRole = this.data.deviceRoles.find(function (value) {
                     return value.id === objectId;
                 });
-                let device = deviceUser.get('device');
+                let device = deviceRole.get('device');
                 let game = device.get('game');
-                console.log(`devices:soItemTapAction:game:${JSON.stringify(game)} `);
+                console.log(`devices:soItemTapAction:game:${game && game.get('title')} `);
                 let content = `你确定要删除${device.get('uuid')}吗？`;
                 if (game) {
                     content = `这个大屏幕绑定了比赛[${game.get('title')}],${content}`
@@ -188,13 +196,13 @@ Page({
                 this.setData({
                     asVisible: true,
                     asContent: content,
-                    soDeviceUser: deviceUser
+                    soDeviceRole: deviceRole
                 });
                 break;
             case 'name':
                 //跳转到editDevice的编辑界面
                 wx.navigateTo({
-                    url: `../editDeviceTitle/editDeviceTitle?deviceUserId=${objectId}`,
+                    url: `../editDeviceTitle/editDeviceTitle?deviceRoleId=${objectId}`,
                 });
                 this._closeAllSwipeout();
                 break;
@@ -227,226 +235,186 @@ Page({
         this.setData({ toggles });
     },
 
-    /**
-     * 
-     * @param {*} dusers 
-     * @param {*} gameIds 
-     * @param {*} that 
-     */
-    _fetchDeviceUserWithGame: function (deviceUsers, gameIds, that) {
-        console.log(`devices:_fetchDeviceUserWithGame:gameIds:${JSON.stringify(gameIds)}`);
-        let gameQuery = new Parse.Query(Game);
-        gameQuery.select("title");
-        gameQuery.containsAll("objectId", gameIds);
-        return gameQuery.find().then(function (games) {
-            let deviceUsersForView = [];
-            for (let i = 0; i < deviceUsers.length; i++) {
-                const deviceUser = deviceUsers[i];
-                let device = deviceUser.get('device');
 
+    /**
+     * 获取DeviceRole列表
+     */
+    _fetchDeviceRoles: function () {
+        this.setData({
+            loading: true,
+        });
+        let that = this;
+        console.log(`devices:_fetchDeviceRoles`);
+        //用户取消分享他人权限会触发curRole的修改
+        //但Parse.User.current()不会重新获取  所以fetch一下curUser
+        let curUser = Parse.User.current();
+        curUser.fetch().then(function (user) {
+            //获取DeviceRole列表
+            let query = new Parse.Query(DeviceRole);
+            query.descending('createdAt');
+            query.include(['device.game']);//多级包含 好用
+            query.equalTo('role', user.get('curRole'));
+            return query.find();
+        }).then(function (deviceRoles) {
+            console.log(`devices:_fetchDeviceRoles:deviceRoles:${deviceRoles && deviceRoles.length}`);
+            let deviceRolesForView = [];
+            for (let i = 0; i < deviceRoles.length; i++) {
+                const deviceRole = deviceRoles[i];
+                let device = deviceRole.get('device');
                 //微信wxml中只能获取子 不能获取孙 
                 //先初始化要显示出来的label
                 let label = '未显示比赛';
                 let game = device.get('game');
                 if (game) {
-                    game = games.find(function (value) {
-                        return value.id === game.id;
-                    });
-                    if (game)
-                        label = game.get('title');
+                    label = game.get('title');
                 }
-
-                console.log(`devices:_fetchDeviceUsers:label:${JSON.stringify(label)}`);
+                console.log(`devices:_fetchDeviceRoles:label:${label}`);
                 let uuid = device.get('uuid');
-                let title = `${deviceUser.get('title')} [${uuid}]`;
-
-                let deviceUserForView = { objectId: deviceUser.id, id: deviceUser.id, uuid, label, title };
-                deviceUsersForView.push(deviceUserForView);
+                let title = `${deviceRole.get('title')} [${uuid}]`;
+                let deviceRoleForView = { objectId: deviceRole.id, id: deviceRole.id, uuid, label, title };
+                deviceRolesForView.push(deviceRoleForView);
             }
-
-            console.log(`devices:_fetchDeviceUsers:deviceUsers:${deviceUsers.length}`);
             //初始化toggles为全部关闭
             let toggles = [];
-            deviceUsers.forEach(item => {
+            deviceRoles.forEach(item => {
                 toggles.push(false);
             });
-
+            //关闭下拉刷新的动画
+            wx.stopPullDownRefresh()
             that.setData({
                 loading: false,
-                deviceUsers,
-                deviceUsersForView,
+                deviceRoles,
+                deviceRolesForView,
                 needReload: false,
                 toggles
             });
-
-        }).catch(function (error) {
-            console.log(`devices:_fetchDeviceUserWithGame:error:${error}`);
-        });
-    },
-    /**
-     * 如果所有屏幕都没有显示game 就不用单独获取game的名称了
-     * @param {*} dusers 
-     * @param {*} that 
-     */
-    _fetchDeviceUserNoGame: function (deviceUsers, that) {
-
-        let deviceUsersForView = [];
-        for (let i = 0; i < deviceUsers.length; i++) {
-            const deviceUser = deviceUsers[i];
-            let device = deviceUser.get('device');
-            //微信wxml中只能获取子 不能获取孙 
-            //先初始化要显示出来的label
-            let label = '未显示比赛';
-            let uuid = device.get('uuid');
-
-            let title = `${deviceUser.get('title')} [${uuid}]`;
-
-
-            let deviceUserForView = { objectId: deviceUser.id, id: deviceUser.id, uuid, label, title };
-            deviceUsersForView.push(deviceUserForView);
-        }
-        //初始化toggles为全部关闭
-        let toggles = [];
-        deviceUsers.forEach(item => {
-            toggles.push(false);
-        });
-
-        that.setData({
-            loading: false,
-            deviceUsers,
-            deviceUsersForView,
-            needReload: false,
-            toggles
-        });
-
-    },
-    /**
-     * 获取DevicesUser列表
-     */
-    _fetchDeviceUsers: function () {
-        this.setData({
-            loading: true,
-        });
-        let that = this;
-        console.log(`devices:_fetchDeviceUsers`);
-        //获取DeviceUser列表
-        let query = new Parse.Query(DeviceUser);
-        query.descending('createdAt');
-        query.include('device');
-        query.equalTo('user', Parse.User.current());
-        query.find().then(function (deviceUsers) {
-            let gameIds = [];
-            for (let i = 0; i < deviceUsers.length; i++) {
-                const deviceUser = deviceUsers[i];
-                let game = deviceUser.get('device').get('game');
-                if (game)
-                    gameIds.push(game.id);
-            }
-            console.log(`devices:_fetchDeviceUsers:gameIds:${gameIds}`);
-            if (gameIds) {
-                return that._fetchDeviceUserWithGame(deviceUsers, gameIds, that);
-            } else {
-                return that._fetchDeviceUserNoGame(deviceUsers, that);
-            }
         });
     },
 
 
     /**
-     * wxml中wx:for如果传Parse Object
-     * 凡是通过object.get('name')来获取的数据都可能为空 还会报Expect FLOW_CREATE_NODE but get another错误
-     * 所以重新生成一gamesForView数组，专门用于wxml中显示使用
-     */
-    _createDeviceUsersForView: function (deviceUsers) {
-        let deviceUsersForView = [];
-        deviceUsers.forEach(item => {
-            //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
-            //添加startTimeMills字段，根据startTime的getTime()生成startTimeMills 
-            deviceUsersForView.push({ objectId: item.id, id: item.id, title: item.get('title'), subTitle: item.get('subTitle'), startTime: item.get('startTime'), startTimeMills: item.get('startTime').getTime() })
-        });
-        return deviceUsersForView;
-    },
-
-    /**
-     * 绑定大屏幕到当前用户
+     * 绑定大屏幕到当前用户的curRole
      * @param {*} uuid 
      */
-    _bindDeviceToUser(uuid) {
-        console.log(`devices: bindDeviceToUser:uuid:${uuid}`);
+    _bindDeviceToRole(uuid) {
+        console.log(`devices: _bindDeviceToRole:uuid:${uuid}`);
         let that = this;
         let _device;
         let query = new Parse.Query('Device');
         query.equalTo('uuid', uuid);
         //判断这个大屏幕是不是存在
         query.first().then(function (device) {
-            console.log(`devices: bindDeviceToUser:device:${device}`);
+            _device = device;
+            console.log(`devices: _bindDeviceToRole:device:${device && device.get('uuid')}`);
             if (!device) {
                 return Parse.Promise.error("这个大屏幕不存在。");
             } else {
-                _device = device;
-                let query = new Parse.Query('DeviceUser');
+                let query = new Parse.Query('DeviceRole');
                 query.equalTo('device', device);
+                query.include('role');
                 return query.first();
             }
-        }).then(function (deviceUser) {
-            //判断这个大屏幕是否已经和用绑定
-            //如果为空 新建绑定
-            if (!deviceUser) {
-                let DeviceUser = Parse.Object.extend("DeviceUser");
-                let deviceUser = new DeviceUser();
-                deviceUser.set('user', Parse.User.current());
-                deviceUser.set('device', _device);
-                return deviceUser.save();
+        }).then(function (dr) {
+            //判断这个大屏幕是否已经和当前用户的curRole绑定
+            if (dr) {
+                let role = dr.get('role');
+                let curRole = Parse.User.current().get('curRole');
+                console.log(`devices: _bindDeviceToRole:role:${role && role.get('name')} curRole:${curRole && curRole.get('name')}`);
+                if (role && role.get('name') == curRole.get('name')) {
+                    //如果和当前用户绑定 直接报错
+                    return Parse.Promise.error("这个大屏幕已经和你绑定。无须再次绑定。");
+                } else {
+                    //如果和其它用户绑定 直接解绑
+                    //一定要return 不然就不是同步了
+                    return that._unbindDeviceToRole(uuid).then(function (dr) {
+                        if (dr) {
+                            let device = dr.get('device');
+                            let role = dr.get('role')
+                            console.log(`devices: _bindDeviceToRole:_unbindDeviceToRole:deviceRole:device:${device && device.id} role:${role && role.id}`);
+                        } else {
+                            console.log(`devices: _bindDeviceToRole:_unbindDeviceToRole:deviceRole:${dr}`);
+                        }
+                        let DeviceRole = Parse.Object.extend("DeviceRole");
+                        let deviceRole = new DeviceRole();
+                        deviceRole.set('role', curRole);
+                        deviceRole.set('device', _device);
+                        return deviceRole.save();
+                    })
+                }
+            } else {
+                //没有绑定任何一个，直接保存
+                let DeviceRole = Parse.Object.extend("DeviceRole");
+                let deviceRole = new DeviceRole();
+                deviceRole.set('role', Parse.User.current().get('curRole'));
+                deviceRole.set('device', _device);
+                return deviceRole.save();
             }
-            //不为空 说明已经绑定
-            else {
-                return Parse.Promise.error("这个大屏幕已经绑定。");
+        }).then(function (deviceRole) {
+            if (deviceRole) {
+                let device = deviceRole.get('device');
+                let role = deviceRole.get('role')
+                console.log(`devices: _bindDeviceToRole:deviceRole:device:${device && device.id} role:${role && role.id}`);
+            } else {
+                console.log(`devices: _bindDeviceToRole:deviceRole:${deviceRole}`);
             }
-        }).then(function (deviceUser) {
-            console.log(`devices: bindDeviceToUser:game:${JSON.stringify(deviceUser)}`);
-            //重新获取device进行更新
-            that._fetchDeviceUsers();
-        }, function (error) {
-            console.log(`devices: bindDeviceToUser:error:${error}`);
+            //不在获取了 因为已经加了监听 监听负责更新
+            //重新获取device进行更新 
+            // that._fetchDeviceRoles();
+        }).catch(function (error) {
+            console.log(`devices: _bindDeviceToRole:error:${error}`);
             wx.showModal({ content: error, showCancel: false, confirmText: `我知道了` });
-        })
+            //重新获取device进行更新
+            that._fetchDeviceRoles();
+        });
     },
+
+
     /**
      * 解除当前用户指定大屏幕的绑定
      * 返回是Promise
      * @param {*} uuid 
      */
-    _unbindDeviceToUser(uuid) {
+    _unbindDeviceToRole(uuid) {
         let that = this;
-        let _device;
         let query = new Parse.Query('Device');
         query.equalTo('uuid', uuid);
         //判断这个大屏幕是不是存在
         return query.first().then(function (device) {
-            console.log(`devices:unbindDeviceToUser:device:${device.get('uuid')}`);
+            console.log(`devices:_unbindDeviceToRole:device:${device && device.get('uuid')}`);
             if (!device) {
                 return Parse.Promise.error("这个大屏幕不存在。");
             } else {
-                _device = device;
-                let query = new Parse.Query('DeviceUser');
+                //判断有没有绑定
+                let query = new Parse.Query('DeviceRole');
                 query.equalTo('device', device);
-                query.include('device');
+                query.include(['device.game']);
                 return query.first();
             }
-        }).then(function (deviceUser) {
+        }).then(function (deviceRole) {
+            if (deviceRole) {
+                let device = deviceRole.get('device');
+                let role = deviceRole.get('role')
+                console.log(`devices: _unbindDeviceToRole:deviceRole:device:${device && device.id} role:${role && role.id}`);
+            } else {
+                console.log(`devices: _unbindDeviceToRole:deviceRole:${deviceRole}`);
+            }
+
             //如果为空 说明没有绑定
-            if (!deviceUser) {
+            if (!deviceRole) {
                 return Parse.Promise.error("这个大屏幕没有和您绑定。");
             }
             //不为空 说明已经绑定 
             else {
+                let device = deviceRole.get('device');
+                let game = device.get('game');
                 //判断这个device是否绑定了GAME
-                if (_device.get('game')) {
-                    // return Parse.Promise.error("这个大屏幕绑定了Game，无法解绑。");
-                    that._unbindDeviceToGame(_device, _device.get('game'));
-                    return deviceUser.destroy();
+                if (game) {
+                    //先把game解绑
+                    return that._unbindDeviceToGame(device, game).then(function (game) {
+                        return deviceRole.destroy();
+                    });
                 } else {
-                    return deviceUser.destroy();
+                    return deviceRole.destroy();
                 }
             }
         })
@@ -456,31 +424,67 @@ Page({
      * @param {*} uuid
      */
     _unbindDeviceToGame(device, game) {
-        console.log(`devices:_unbindDeviceToGame:uuid:${device.get('uuid')} game:${game.objectId}`);
+        console.log(`devices:_unbindDeviceToGame:uuid:${device && device.get('uuid')} game:${game && game.id}`);
         device.set('game', null);
         return device.save().then(function (device) {
-            console.log(`devices:_unbindDeviceToGame:device2:${JSON.stringify(device)}`);
-            let screens = game.get('screens');
-            if (screens) {
-                //看看存不存在
-                let index = screens.findIndex(function (value, index, arr) {
-                    return value.id === device.id;
-                });
-                //如果存在 删除后保存
-                if (index != -1) {
-                    screens.splice(index, 1);
-                    game.set('screens', screens);
-                    //判断还有没有screens 如果已经没有了 删除screen（角色)读取此game的权限
-                    let gameAcl = game.get('ACL');
-                    gameAcl.setRoleReadAccess('screen', false);
-                    gameAcl.setRoleWriteAccess('screen', false);
-                    return game.save();
+            console.log(`devices:_unbindDeviceToGame:device:${device && device.get('uuid')}`);
+            return game.fetch().then(function (game) {
+                let screens = game.get('screens');
+                console.log(`devices:_unbindDeviceToGame:screens:${screens && screens.length}`);
+                if (screens) {
+                    //看看存不存在
+                    let index = screens.findIndex(function (value) {
+                        return value.id === device.id;
+                    });
+                    //如果存在 删除后保存
+                    if (index != -1) {
+                        screens.splice(index, 1);
+                        game.set('screens', screens);
+                        //判断还有没有screens 如果已经没有了 删除screen（角色)读取此game的权限
+                        let gameAcl = game.get('ACL');
+                        gameAcl.setRoleReadAccess('screen', false);
+                        gameAcl.setRoleWriteAccess('screen', false);
+                        return game.save();
+                    }
                 }
-            }
-        }).then(function (game) {
-            console.log(`devices:_unbindDeviceToGame:device:${device.get('uuid')} game:${game.get('title')} `);
-        }, function (error) {
-            console.log(`devices:_unbindDeviceToGame:error:${error}`);
-        })
+            })
+        });
+    },
+    /**
+     * 监听curRole下的大屏幕状态
+     * 主要是在绑定或解绑时更新界面
+     */
+    _subscribeDeviceRole: function () {
+        if (sDeviceRoles) {
+            sDeviceRoles.unsubscribe();
+            sDeviceRoles = null;
+        }
+        let that = this;
+        let curUser = Parse.User.current();
+        let curRole = curUser ? curUser.get('curRole') : undefined;
+        if (curRole) {
+            let query = new Parse.Query(DeviceRole);
+            query.equalTo('role', curRole);
+            query.include(['device.game']);
+            sDeviceRoles = query.subscribe();
+            sDeviceRoles.on('open', () => {
+                console.log(`devices:sDeviceRoles:opened`);
+            });
+            sDeviceRoles.on('create', (game) => {
+                console.log(`devices:sDeviceRoles:create`);
+                that._fetchDeviceRoles();
+            });
+            sDeviceRoles.on('update', (game) => {
+                console.log(`devices:sDeviceRoles:update`);
+                that._fetchDeviceRoles();
+            });
+            sDeviceRoles.on('delete', (game) => {
+                console.log(`devices:sDeviceRoles:delete`);
+                that._fetchDeviceRoles();
+            });
+            sDeviceRoles.on('close', () => {
+                console.log('devices:sDeviceRoles:closed');
+            });
+        }
     },
 })

@@ -32,7 +32,7 @@ Page({
     let nickName = e.detail.userInfo.nickName;
     let avatarUrl = e.detail.userInfo.avatarUrl;
     console.log(`index:onGetUserInfoTop:nickName:${nickName} avatarUrl:${avatarUrl}`)
-    if (nickName && avatarUrl) {
+    if (nickName) {
       //2、存入parse对象中
       let that = this;
       let user = Parse.User.current();

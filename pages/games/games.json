@@ -1,5 +1,6 @@
 {
     "navigationBarTitleText": "比赛列表",
+    "enablePullDownRefresh": true,
     "usingComponents": {
         "i-swipeout": "../../dist/swipeout/index",
         "i-cell-group": "../../dist/cell-group/index",

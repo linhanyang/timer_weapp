@@ -1,5 +1,6 @@
 {
     "navigationBarTitleText": "分享权限",
+    "enablePullDownRefresh": true,
     "usingComponents": {
         "i-swipeout": "../../dist/swipeout/index",
         "i-cell-group": "../../dist/cell-group/index",

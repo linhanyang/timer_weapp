@@ -12,7 +12,10 @@
         "pages/devices/devices",
         "pages/editDeviceTitle/editDeviceTitle",
         "pages/editDeviceGame/editDeviceGame",
-        "pages/dealShareRole/dealShareRole"
+        "pages/dealShareRole/dealShareRole",
+        "pages/editGameReward/editGameReward",
+        "pages/editRoleTitle/editRoleTitle",
+        "pages/editGameNotification/editGameNotification"
     ],
     "window": {
         "backgroundTextStyle": "light",

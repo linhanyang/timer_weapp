@@ -54,7 +54,7 @@ Page({
         game.set(props, value);
       }
         break;
-      case 'subtract': {
+      case 'add': {
         let value = game.get(props);
         if (value)
           value = value + 1;
@@ -204,6 +204,20 @@ Page({
       }
     }
   },
+
+  onRewardClicked: function (e) {
+    //跳转到editDeviceGame
+    wx.navigateTo({
+      url: `../editGameReward/editGameReward?gameId=${this.data.game.id}`,
+    })
+  },
+  onNotificationClicked: function (e) {
+    //跳转到editDeviceGame
+    wx.navigateTo({
+      url: `../editGameNotification/editGameNotification?gameId=${this.data.game.id}`,
+    })
+
+  },
   _subscribeGame: function () {
     //如果已经存在说已经监听 先取消监听
     if (sgame) {
@@ -236,12 +250,27 @@ Page({
       });
     }
   },
+
+  /**
+   * 更新Game到parse
+   * 然后通过liveQuerry监听改变
+   */
+  _updateGame: function (game) {
+    //这两个属性不需要保存到服务器
+    game.unset('pauseTimeMills');
+    game.unset('startTimeMills');
+    game.save().then(function (game) {
+      console.log(`viewGame_:_updateGame::${game.id}`)
+    }, function (error) {
+      console.error(`viewGame_:error:${JSON.stringify(error)}`)
+    });
+  },
   /**
    * 根据ID获取game详情
    */
   _fetchGame: function (objectId) {
     console.log(`viewGame_:_fetchGame:objectId:${objectId}`);
-    
+
     this.setData({ loading: true });
     let that = this;
     let query = new Parse.Query(Game);
@@ -258,26 +287,27 @@ Page({
   },
 
   /**
-   * 更新Game到parse
-   * 然后通过liveQuerry监听改变
-   */
-  _updateGame: function (game) {
-    //这两个属性不需要保存到服务器
-    game.unset('pauseTimeMills');
-    game.unset('startTimeMills');
-    game.save().then(function (game) {
-      console.log(`viewGame_:_updateGame::${game.id}`)
-    }, function (error) {
-      console.error(`viewGame_:error:${JSON.stringify(error)}`)
-    });
-  },
-
-  /**
    * wxml中wx:for如果传Parse Object
    * 凡是通过object.get('name')来获取的数据都可能为空 还会报Expect FLOW_CREATE_NODE but get another错误
    * 所以重新生成一gameForView对象，专门用于wxml中显示使用
    */
   _createGameForView: function (game) {
+    let reward = game.get('reward');
+    if (reward) {
+      let rewards = reward.split('\n');
+      if (rewards.length > 1) {
+        reward = rewards[0] + " ..."
+      }
+    }
+
+    
+    let notification = game.get('notification');
+    if (notification) {
+      let notifications = notification.split('\n');
+      if (notifications.length > 1) {
+        notification = notifications[0] + " ..."
+      }
+    }
     //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
     //添加startTimeMills、pauseTimeMills字段，根据startTime、pauseTime的getTime()生成startTimeMills
     let gameForView = {
@@ -286,7 +316,6 @@ Page({
       objectId: game.id,
       //desc
       title: game.get('title'),
-      subTitle: game.get('subTitle'),
       startTimeMills: game.get('startTime').getTime(),
       startChips: game.get('startChips'),
       rebuy: game.get('rebuy'),
@@ -297,7 +326,9 @@ Page({
       addonCount: game.get('addonCount'),
       players: game.get('players'),
       restPlayers: game.get('restPlayers'),
-      players: game.get('players'),
+      rewardPlayers: game.get('rewardPlayers'),
+      reward:reward,
+      notification: notification,
       //rounds
       rounds: game.get('rounds'),
     };

@@ -1,16 +1,16 @@
 <view class="component__hd">盲注列表</view>
-<view wx:for="{{rounds}}" wx:key="objectId" wx:for-item="round" wx:for-index="idx">
+<view wx:for="{{rounds}}" wx:key="level" wx:for-item="round" wx:for-index="idx">
     <i-swipeout operateWidth="{{round.actions.length * 60}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
         <view slot="content" catch:tap="soCotentTapAction" data-round-level="{{round.level}}">
             <i-cell wx:if="{{round.breakDuration && round.breakDuration !== 0}}" i-class="i-cell-padding" style="{{round.style}}" title="级别{{round.level}} {{round.ante}}/{{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟" label="休息{{round.breakDuration}}分钟"></i-cell>
-            <i-cell wx:if="{{!round.breakDuration || round.breakDuration == 0}}" i-class="i-cell-padding" style="{{round.style}}" title="级别{{round.level}} {{round.ante}}/{{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟" ></i-cell>
+            <i-cell wx:else i-class="i-cell-padding" style="{{round.style}}" title="级别{{round.level}} {{round.ante}}/{{round.smallBlind}}/{{round.bigBlind}} {{round.duration}}分钟"></i-cell>
         </view>
         <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
-            <view wx:for="{{round.actions}}" wx:for-item="action" wx:key="key" class="i-swipeout-button" style="width:60px">
-                <view bind:tap="soItemTapAction" data-action="{{action.key}}" data-round-level="{{round.level}}">
+            <block wx:for="{{round.actions}}" wx:for-item="action" wx:key="key" class="i-swipeout-button" style="width:60px">
+                <view  class="i-swipeout-button" bind:tap="soItemTapAction" data-action="{{action.key}}" data-round-level="{{round.level}}">
                     {{action.lbl}}
                 </view>
-            </view>
+            </block>
         </view>
     </i-swipeout>
 </view>

@@ -1,21 +1,21 @@
 var Parse = require('../../parse');
-let DeviceRole = Parse.Object.extend("DeviceRole");
+let Role = Parse.Object.extend("_Role");
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    deviceRole: {},
+    role: {},
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    let id = options.deviceRoleId;
-    console.log(`editDeviceTitle:onLoad:id:${id}`);
-    this._fetchDeviceRole(id);
+    let id = options.roleId;
+    console.log(`editRoleTitle:onLoad:id:${id}`);
+    this._fetchRole(id);
   },
 
   /**
@@ -49,11 +49,11 @@ Page({
    * 验证input输入是否正确
    */
   _validateTitleInput: function (value) {
-    console.log(`editDeviceTitle:_validateInput`)
+    console.log(`editRoleTitle:_validateInput`)
     let error = null;
     if (!value || value.length === 0) {
       error = "名称不能为空"
-    } else if (value.length > 10) {
+    } else if (value.length > 100) {
       error = "模板名称太长"
     }
     this.setData({
@@ -93,20 +93,16 @@ Page({
     }
   },
   /**
-   * 根据ID获取deviceRole详情
+   * 根据ID获取role详情
    */
-  _fetchDeviceRole: function (objectId) {
-    console.log(`editDeviceTitle:_fetchDeviceRole:objectId:${objectId}`);
+  _fetchRole: function (objectId) {
+    console.log(`editRoleTitle:_fetchRole:objectId:${objectId}`);
     let that = this;
-    let query = new Parse.Query(DeviceRole);
-    query.include('rounds');
-    query.get(objectId).then(function (deviceRole) {
-      console.log(`editDeviceTitle:_fetchDeviceRole:deviceRole:${deviceRole.id}`);
-      //微信wxml中只能获取子 不能获取孙 
-      let uuid = deviceRole.get('device').get('uuid');
-      deviceRole.set('uuid', uuid);
-      that.setData({ deviceRole: deviceRole }, function () {
-        console.log(`editDeviceTitle:_fetchDeviceRole:setDataFinished`);
+    let query = new Parse.Query(Role);
+    query.get(objectId).then(function (role) {
+      console.log(`editRoleTitle:_fetchRole:role:${role.id}`);
+      that.setData({ role: role }, function () {
+        console.log(`editRoleTitle:_fetchRole:setDataFinished`);
       });
     }, function (error) {
       console.error(error);
@@ -117,17 +113,11 @@ Page({
    */
   _update() {
     let that = this;
-    let deviceRole = this.data.deviceRole;
+    let role = this.data.role;
     let title = this.data.title;
-    
-    //删除只展示的属性 不保存到数据库
-    deviceRole.uuid = undefined;
-    deviceRole.label = undefined;
-    delete deviceRole.uuid;
-    delete deviceRole.label;
 
-    deviceRole.save({ title }).then(function (deviceRole) {
-      console.log(`editDeviceTitle:_update::title：${title}`);
+    role.save({ title }).then(function (role) {
+      console.log(`editRoleTitle:_update::title：${title}`);
       that.setData({
         saving: false,
       });
@@ -136,7 +126,7 @@ Page({
         delta: 1
       })
     }, function (error) {
-      console.log(`editDeviceTitle:_update:error:${JSON.stringify(error)}`)
+      console.log(`editRoleTitle:_update:error:${JSON.stringify(error)}`)
     });
   },
   /**
@@ -150,7 +140,7 @@ Page({
     prevPage.setData({
       needReload: true,
     }, function () {
-      console.log(`editDeviceTitle:_notifyPrevPage:setDataFinished`);
+      console.log(`editRoleTitle:_notifyPrevPage:setDataFinished`);
     });
   },
 })

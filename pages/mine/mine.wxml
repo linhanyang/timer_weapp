@@ -5,10 +5,22 @@
             <open-data class="userinfo-avatar" type="userAvatarUrl"></open-data>
             <open-data class="userinfo-nickname" type="userNickName"></open-data>
         </view>
+        <i-panel title="大屏幕内容">
+            <i-cell title="{{curRoleForView.title}}" is-link bind:click="onTitleClicked"></i-cell>
+            <i-cell title="ICON" is-link bind:click="onIconClicked">
+                <i-avatar slot="icon" size="large" src="{{curRoleForView.icon}}" />
+            </i-cell>
+            <i-cell title="背景" is-link bind:click="onBGClicked">
+                <i-avatar slot="icon" size="large" src="{{curRoleForView.bg}}" />
+            </i-cell>
+        </i-panel>
+        <input type="file" id="profilePhotoFileUpload" />
         <view wx:if="{{isShared}}">
             <i-panel title="共享权限信息">
                 <view style="padding: 15px;">
-                    您正使用[{{sharedUser?sharedUser.objectId:'unknown'}}]的用户权限。
+                    您正使用
+                    <i-avatar src="{{sharedUserForView.avatarUrl}}" size="small"></i-avatar>
+                    [{{sharedUserForView.nickName}}]的用户权限。
                 </view>
             </i-panel>
             <view class="weui-btn-area">
@@ -18,32 +30,36 @@
             </view>
         </view>
         <view wx:if="{{!isShared}}">
-            <view class="weui-btn-area">
-                <button class="weui-btn" type="primary" open-type="share" loading="{{sharing}}">
-                    分享权限给好友
-                </button>
-            </view>
-            <view class="component__hd">已共享你权限的用户</view>
-            <block wx:for="{{usersForView}}" wx:key="objectId" wx:for-item="user">
-                <i-swipeout i-class="i-swipeout-item" operateWidth="{{60}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
-                    <view slot="content">
-                        <i-cell i-class="i-cell-padding" title="{{user.nickName}}">
-                            <i-avatar slot="icon" src="{{user.avatarUrl}}" size="small"></i-avatar>
-                        </i-cell>
-                    </view>
-                    <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
-                        <view class="i-swipeout-button" style="width:60px" bindtap="soDeleteTapAction" data-user="{{user.objectId}}">
-                            <i-icon size="48" type="delete_fill"></i-icon>
-                        </view>
-                    </view>
-                </i-swipeout>
-            </block>
-            <i-action-sheet visible="{{ asVisible }}" actions="{{ asActions }}" show-cancel bind:cancel="handleASCancel" bind:click="handleASItemClick" mask-closable="{{ false }}">
-                <view slot="header" style="padding: 16px">
-                    <view style="color: #444;font-size: 16px">确定删除用户[{{soUser.objectId}}]吗？</view>
-                    <text>删除后无法恢复哦</text>
+            <i-panel title="共享权限信息">
+                <view class="weui-btn-area">
+                    <button class="weui-btn" type="primary" open-type="share" loading="{{sharing}}">
+                        分享权限给好友
+                    </button>
                 </view>
-            </i-action-sheet>
+                <view class="component__hd">已共享你权限的用户</view>
+                <block wx:for="{{usersForView}}" wx:key="objectId" wx:for-item="user">
+                    <i-swipeout i-class="i-swipeout-item" operateWidth="{{60}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+                        <view slot="content">
+                            <i-cell i-class="i-cell-padding" title="{{user.nickName}}">
+                                <i-avatar slot="icon" src="{{user.avatarUrl}}" size="small"></i-avatar>
+                            </i-cell>
+                        </view>
+                        <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
+                            <view class="i-swipeout-button" style="width:60px" bindtap="soDeleteTapAction" data-user="{{user.objectId}}">
+                                <i-icon size="48" type="delete_fill"></i-icon>
+                            </view>
+                        </view>
+                    </i-swipeout>
+                </block>
+                <i-action-sheet visible="{{ asVisible }}" actions="{{ asActions }}" show-cancel bind:cancel="handleASCancel" bind:click="handleASItemClick" mask-closable="{{ false }}">
+                    <view slot="header" style="padding: 16px">
+                        <view style="color: #444;font-size: 16px">
+                            确定删除用户[{{soUser.objectId}}]吗？
+                        </view>
+                        <text>删除后无法恢复哦</text>
+                    </view>
+                </i-action-sheet>
+            </i-panel>
         </view>
     </view>
 </view>

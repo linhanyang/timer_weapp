@@ -25,12 +25,12 @@ Component({
         },
         pCurrentRoundIndex: {
             type: Number,
-            value: -1,
+            value: undefined,
             observer: '_indexChange'
         },
         pStatus: {
             type: String,
-            value: '',
+            value: undefined,
             observer: '_statusChange'
         },
     },
@@ -55,7 +55,7 @@ Component({
     },
     methods: {
         _gameChange(newGame, oldGame) {
-            console.log(`rounds:_gameChange:newGame:${JSON.stringify(newGame)}`);
+            console.log(`rounds:_gameChange:newGame:${newGame && newGame.title}`);
             this._generateRounds();
         },
         _indexChange(newIndex, oldIndex) {
@@ -76,9 +76,9 @@ Component({
             let oldExpanded = this.data.oldExpanded;
             let nextExpanded = this.data.nextExpanded;
 
-            //因为swipeout的Touchstart,Touchmove,Touchend顺序执行完之后才会执行到content的Tap事件，
-            //swipeout在touchend中通过前两个方法中产生的数据计算当前操作是展开还是关半，因此expanded状态的值也是在touchend中改变的
-            //因此只有oldExpanded和nextExpanded都为false时，才能说明这个swipeout是真正关闭的，不跳转，也要清除其它的swipeout
+            // 因为swipeout的Touchstart,Touchmove,Touchend顺序执行完之后才会执行到content的Tap事件，
+            // swipeout在touchend中通过前两个方法中产生的数据计算当前操作是展开还是关半，因此expanded状态的值也是在touchend中改变的
+            // 因此只有oldExpanded和nextExpanded都为false时，才能说明这个swipeout是真正关闭的，不跳转，也要清除其它的swipeout
             if (oldExpanded == false && nextExpanded == false) {
                 this._closeAllSwipeout();
             }
@@ -94,7 +94,7 @@ Component({
             let old = e.detail.oldValue;
             let next = e.detail.nextValue;
             let index = e.currentTarget.dataset.index;
-            console.log(`rounds:onExpandedChange:old:${old} next:${next} toggles:${this.data.toggles}`);
+            // console.log(`rounds:onExpandedChange:old:${old} next:${next} index:${index}`);
             this.setData({ oldExpanded: old, nextExpaned: next });
             if (old == false && next == true) {
                 this._closeAllSwipeoutExcept(index);
@@ -209,9 +209,8 @@ Component({
          * properties中game、currentRoundIndex、status有改变，都强制触发此方法更新rounds
          */
         _generateRounds: function () {
-            console.log(`rounds:_generateRounds_:game:${this.properties.game}`);
-            if (this.properties.game.rounds) {
-                console.log(`rounds:_generateRounds_:rounds:${this.properties.game.rounds.length}`);
+            console.log(`rounds:_generateRounds_:game:${this.properties.game && this.properties.game.title} pStatus:${this.properties.pStatus} pCurrentRoundIndexs:${this.properties.pCurrentRoundIndex}`);
+            if (this.properties.game && this.properties.game.rounds && this.properties.pStatus) {
                 let rounds = [];
                 let toggles = [];
                 for (let i = 0; i < this.properties.game.rounds.length; i++) {

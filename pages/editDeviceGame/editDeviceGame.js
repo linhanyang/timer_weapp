@@ -1,21 +1,25 @@
 var Parse = require('../../parse');
-let DeviceUser = Parse.Object.extend("DeviceUser");
+let DeviceRole = Parse.Object.extend("DeviceRole");
+let Game = Parse.Object.extend("Game");
+const TYPES = [{ key: 'normal', lbl: '正常' }, { key: 'withreward', lbl: '带奖池' }];
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    deviceUser: {},
+    deviceRole: {},
+    types: TYPES,
+    type: { key: 'normal', lbl: '正常' },
+    typeIndex: 0, 
     games: [],
     gameIndex: 0,
   },
-
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    let id = options.deviceUserId;
+    let id = options.deviceRoleId;
     console.log(`editDeviceGame:onLoad:id:${id}`);
     this._init(id);
   },
@@ -43,6 +47,18 @@ Page({
       })
     }
   },
+
+  bindTypeChange: function (e) {
+    let index = e.detail.value;
+    let types = this.data.types;
+    let type = types[index];
+    this.setData({
+      typeIndex: index,
+      type,
+      typeError: null,
+    })
+  },
+
   bindErrorTip: function (e) {
     let id = e.currentTarget.id;
     let error = this.data.gameError;
@@ -71,14 +87,14 @@ Page({
   /**
    * 初始化 
    * 1、先获取games
-   * 2、再获取deviceuser
-   * 3、再跟据deviceUser中的gameId,确认gameIndex
+   * 2、再获取deviceRole
+   * 3、再跟据device中的type,确认typeIndex
+   * 4、再跟据deviceRole中的gameId,确认gameIndex
    * @param {*} objectId 
    */
   _init: function (objectId) {
     //1、先获取games
     let that = this;
-    let Game = Parse.Object.extend("Game");
     let query = new Parse.Query(Game);
     let _games;
     query.descending('_created_at');
@@ -91,19 +107,38 @@ Page({
         games = [nullGame];
       }
       _games = games;
-      //2、再获取deviceuser
-      let query = new Parse.Query(DeviceUser);
+      //2、再获取deviceRole
+      let query = new Parse.Query(DeviceRole);
       query.include('device');
       return query.get(objectId)
-    }).then(function (deviceUser) {
-      console.log(`editDeviceGame:_fetchDeviceUser:deviceUser:${deviceUser.id}`);
+    }).then(function (deviceRole) {
+      console.log(`editDeviceGame:_init:deviceRole:${deviceRole.id}`);
       //微信wxml中只能获取子 不能获取孙 
-      let uuid = deviceUser.get('device').get('uuid');
-      deviceUser.set('uuid', uuid);
+      let uuid = deviceRole.get('device').get('uuid');
+      deviceRole.set('uuid', uuid);
 
-      //3、再跟据deviceUser中的gameId,确认gameIndex
+      // 3、再跟据device中的type,确认typeIndex
+      let device = deviceRole.get('device');
+      let typeStr = device.get('type');
+      let type = TYPES[0];
+      let typeIndex = 0;
+      console.log(`editDeviceGame:_init:device:type:${typeStr}`);
+      if (typeStr) {
+        if (typeStr === 'withreward') {
+          typeIndex = 1;
+          type = TYPES[1];
+        } else {
+          typeIndex = 0;
+          type = TYPES[0];
+        }
+      } else {
+        typeIndex = 0;
+        type = TYPES[0];
+      }
+
+      //4、再跟据deviceRole中的gameId,确认gameIndex
       let gameIndex = 0;
-      let game = deviceUser.get('device').get('game');
+      let game = deviceRole.get('device').get('game');
       if (game) {
         gameIndex = _games.findIndex(function (value) {
           return value.id === game.id;
@@ -112,34 +147,44 @@ Page({
           gameIndex = 0;
       }
 
-      console.log(`editDeviceGame:_fetchDeviceUser:gameIndex:${gameIndex}`);
+      console.log(`editDeviceGame:_init:gameIndex:${gameIndex}`);
       that.setData({
-        deviceUser,
+        deviceRole,
         games: _games,
         gameIndex,
+        game:_games[gameIndex],
+        type,
+        typeIndex,
       });
     }).catch(function (error) {
-      console.error(`editDeviceGame:_fetchGames:error:${error}`)
+      console.error(`editDeviceGame:_init:error:${error}`)
     });
   },
   /**
-   * 编辑
+   * 1、保存显示类型到device中
+   * 2、判断是不是不推送任何比赛
+   *  2.1、不推送比赛相当于解绑， 要获取一下game
+   *  2.2、推送比赛 即是绑定比赛
    */
   _update() {
     let that = this;
-    let deviceUser = this.data.deviceUser;
+    // 1、保存显示类型到device中
+    let deviceRole = this.data.deviceRole;
     let game = this.data.game;
-    let device = deviceUser.get('device');
-
-    // console.log(`editDeviceGame:_update:game:${JSON.stringify(game)}`);
-    //判断是不是不推送任何比赛
-    if (game.id == '0') {
-      //不推送比赛相当于解绑， 要获取一下game
-      game = device.get('game');
-      this._unbindDeviceToGame(device, game);
-    } else {
-      this._bindDeviceToGame(device, game);
-    }
+    let device = deviceRole.get('device');
+    let type = this.data.type;
+    device.save({ type: type.key }).then(function (device) {
+      console.log(`editDeviceGame:_update:device:type:${device.get('type')}`);
+      //2、判断是不是不推送任何比赛
+      if (game.id == '0') {
+        //2.1、不推送比赛相当于解绑， 要获取一下game
+        game = device.get('game');
+        that._unbindDeviceToGame(device, game);
+      } else {
+        //2.2、推送比赛 即是绑定比赛
+        that._bindDeviceToGame(device, game);
+      }
+    })
   },
 
   /**
@@ -152,7 +197,7 @@ Page({
     //一个大屏幕只能被一个game使用。已经被其它的game使用了 先删除
     let oldGame = device.get('game');
     if (oldGame) {
-      console.log(`editDeviceGame:_bindDeviceToGame:oldGame:${JSON.stringify(oldGame)}`);
+      console.log(`editDeviceGame:_bindDeviceToGame:oldGame:${oldGame && oldGame.get('title')}`);
       let screens = oldGame.get('screens');
       if (screens && screens.length > 0) {
         //看看存不存在
@@ -203,7 +248,7 @@ Page({
       device.set('game', game);
       return device.save();
     }).then(function (device) {
-      console.log(`editDeviceGame:_bindDeviceToGame:device1:${device}`);
+      console.log(`editDeviceGame:_bindDeviceToGame:device1:${device && device.get('uuid')}`);
       // 通知上一页重新获取数据 并返回上一页
       that.setData({
         saving: false,
@@ -212,7 +257,7 @@ Page({
       wx.navigateBack({
         delta: 1
       })
-    }, function (error) {
+    }).catch(function (error) {
       console.log(`editDeviceGame:_bindDeviceToGame:error:${error}`);
     })
   },
@@ -222,14 +267,14 @@ Page({
    */
   _unbindDeviceToGame(device, game) {
     let that = this;
-    console.log(`editDeviceGame:_unbindDeviceToGame:uuid:${device.get('uuid')} `);
+    console.log(`editDeviceGame:_unbindDeviceToGame:uuid:${device && device.get('uuid')} `);
     device.set('game', null);
     device.save().then(function (device) {
-      console.log(`editDeviceGame:_unbindDeviceToGame:device2:${JSON.stringify(device)}`);
+      console.log(`editDeviceGame:_unbindDeviceToGame:device:${device && device.get('uuid')}`);
       let screens = game.get('screens');
       if (screens) {
         //看看存不存在
-        let index = screens.findIndex(function (value, index, arr) {
+        let index = screens.findIndex(function (value) {
           return value.id === device.id;
         });
         //如果存在 删除后保存
@@ -244,7 +289,7 @@ Page({
         }
       }
     }).then(function (game) {
-      console.log(`editDeviceGame:_unbindDeviceToGame:device1:${game.get('title')}`);
+      console.log(`editDeviceGame:_unbindDeviceToGame:game:${game && game.get('title')}`);
       // 通知上一页重新获取数据 并返回上一页
       that.setData({
         saving: false,

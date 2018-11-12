@@ -7,8 +7,14 @@
         <!-- 倒计时 计算当前倒计时  当前盲注等 通过事件向page传递相关计算结果 -->
         <!-- 注意 这个game已经不是parse对象 -->
         <countdown game="{{gameForView}}" bind:currentRoundIndexChange="onCurrentRoundIndexChange" bind:statusChange="onStatusChange" bind:pause="onPause" bind:resume="onResume" bind:startImmediate="onStartImmediate"></countdown>
+        <i-panel class="cell-panel-demo" title="奖池">
+            <i-cell title="{{gameForView.reward?gameForView.reward:'无'}}" is-link bind:click="onRewardClicked"></i-cell>
+        </i-panel>
+        <i-panel class="cell-panel-demo" title="通知">
+            <i-cell title="{{gameForView.notification?gameForView.notification:'无'}}" is-link bind:click="onNotificationClicked"></i-cell>
+        </i-panel>
         <!-- 盲注列表 以game中rounds为基础 再根据currentRoundIndex和status生成带不同操作的盲注列表 -->
         <!-- 通过事件向page传递相关后台操作 即Parse的操作都在viewGame.js中 -->
-        <rounds game="{{gameForView}}" pRounds="{{rounds}}" pCurrentRoundIndex="{{currentRoundIndex}}" pStatus="{{status}}" bind:startLevel="onStartLevel" bind:delete="onDelete" />
+        <rounds game="{{gameForView}}" pCurrentRoundIndex="{{currentRoundIndex}}" pStatus="{{status}}" bind:startLevel="onStartLevel" bind:delete="onDelete" />
     </view>
 </view>

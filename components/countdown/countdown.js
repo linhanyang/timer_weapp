@@ -32,9 +32,15 @@ Component({
     },
     ready: function () {
         // console.log(`countdown:ready:this.game:${this.properties.game.title}`);
-        this._getCountdown();
-        if (this.properties.game && !this.properties.game.pauseTime) {
-            interval = setInterval(() => this._getCountdown(), 980);
+        if (this.properties.game) {
+            //如果没有暂停 启动计时器
+            if (!this.properties.game.pauseTime) {
+                interval = setInterval(() => this._getCountdown(), 980);
+            }
+            else {
+                //暂停了 直需要计算一次
+                this._getCountdown();
+            }
         }
     },
     moved: function () {
