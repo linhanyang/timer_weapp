@@ -416,8 +416,6 @@ Page({
      * 所以重新生成一patternForView对象，专门用于wxml中显示使用
      */
     _createPatternForView: function (pattern) {
-        //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
-        //添加startTimeMills、pauseTimeMills字段，根据startTime、pauseTime的getTime()生成startTimeMills
         let patternForView = {
             //id
             id: pattern.id,

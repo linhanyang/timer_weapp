@@ -1,17 +1,7 @@
 <!-- 这是自定义组件desc的内部WXML结构 -->
-<wxs src="../../utils/util.wxs" module="util" />
 <i-panel title="比赛详情">
-    <i-cell title="比赛名称" value="{{game.title}}" ></i-cell>
-    <i-cell title="开始时间" value="{{util.formatShortTime(game.startTimeMills)}}"></i-cell>
-    <i-cell title="起始筹码" value="{{game.startChips}}$"></i-cell>
-    <i-cell wx:if="{{game.rebuy}}" title="重买筹码" value="{{game.rebuyChips}}$"></i-cell>
-    <i-cell wx:if="{{game.addon}}" title="加买筹码" value="{{game.addonChips}}$"></i-cell>
-    <i-cell wx:if="{{game.rebuy}}" title="重买人次">
-        <i-input-number slot="footer" value="{{game.rebuyCount?game.rebuyCount:0}}" min="0" max="9999" bind:change="handlerChange" data-props="rebuyCount" />
-    </i-cell>
-    <i-cell wx:if="{{game.addon}}" title="加买人次">
-        <i-input-number slot="footer" value="{{game.addonCount?game.addonCount:0}}" min="0" max="9999" bind:change="handlerChange" data-props="addonCount" />
-    </i-cell>
+    <i-cell title="比赛名称" value="{{game.title}}"></i-cell>
+    <i-cell title="开始时间" value="{{game.startTime4View}}"></i-cell>
     <i-cell title="玩家人数">
         <i-input-number slot="footer" value="{{game.players?game.players:0}}" min="0" max="9999" bind:change="handlerChange" data-props="players" />
     </i-cell>
@@ -21,4 +11,11 @@
     <i-cell title="奖励人数">
         <i-input-number slot="footer" value="{{game.rewardPlayers?game.rewardPlayers:0}}" min="0" max="9999" bind:change="handlerChange" data-props="rewardPlayers" />
     </i-cell>
+</i-panel>
+<i-panel title="筹码详情">
+    <block wx:for="{{game.chipss}}" wx:key="name" wx:for-item="chips" wx:for-index="idx">
+        <i-cell title="{{chips.name}} {{chips.value}} ">
+            <i-input-number slot="footer" value="{{chips.count?chips.count:0}}" min="0" max="9999" bind:change="handlerChipsChange" data-index="{{idx}}" />
+        </i-cell>
+    </block>
 </i-panel>

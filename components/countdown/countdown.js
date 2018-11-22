@@ -97,8 +97,10 @@ Component({
         _appendRoundStartTime(game) {
             let rounds = [];
             if (game) {
-                // console.log(`countDown:_appendRoundStartTime():game:startTime:${game.startTimeMills} `);
-                let startTime = game.startTimeMills;
+                //传递过来是的一字符串
+                console.log(`countDown:_appendRoundStartTime():game.startTime:${game.startTime} `);
+                // let startTime = new Date(game.startTime).getTime();
+                let startTime = game.startTime;
                 for (let round of game.rounds) {
                     rounds.push({ ...round, startTime });
                     // console.log(`countDown:_appendRoundStartTime():level:${round.level} startTime:${startTime} `);
@@ -116,8 +118,9 @@ Component({
          * 获取倒计时
          */
         _getCountdown() {
+
             //判断是不是暂停 如果有值 是在暂停
-            let pauseTime = this.properties.game.pauseTimeMills;
+            let pauseTime = this.properties.game.pauseTime;
             let dateTime;//需要对比的时间 暂停取暂停时间 没有暂停直接取当前时间
             //没有暂停取当前值
             if (pauseTime) {

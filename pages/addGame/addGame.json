@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "添加比赛",
+    "usingComponents": {
+        "i-swipeout": "../../dist/swipeout/index",
+        "i-cell": "../../dist/cell/index"
+    }
+}

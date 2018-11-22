@@ -1,4 +1,4 @@
-<wxs src="../../utils/util.wxs" module="util" />
+
 <i-load-more wx:if="{{loading}}" tip="正在获取数据" loading="{{ true }}" />
 <view wx:else class="page">
     <view class="page__bd page__bd_spacing">
@@ -9,12 +9,15 @@
         </view>
         <view class="component__hd">比赛列表</view>
         <block wx:for="{{gamesForView}}" wx:key="objectId" wx:for-item="game" wx:for-index="idx">
-            <i-swipeout i-class="i-swipeout-item" operateWidth="{{70}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+            <i-swipeout i-class="i-swipeout-item" operateWidth="{{120}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
                 <view slot="content" catch:tap="soCotentTapAction" data-game="{{game.objectId}}">
-                    <i-cell i-class="i-cell-padding" title="{{game.title}}" label="{{util.formatShortTime(game.startTimeMills)}}"></i-cell>
+                    <i-cell i-class="i-cell-padding" title="{{game.title}}" label="{{game.startTime4View}}"></i-cell>
                 </view>
                 <view slot="button" class="i-swipeout-button-group" style="background:#2db7f5;">
-                    <view class="i-swipeout-button" style="width:70px" bindtap="soDeleteTapAction" data-game="{{game.objectId}}">
+                    <view class="i-swipeout-button" style="width:60px" bind:tap="soItemTapAction" data-action="edit" data-game="{{game.objectId}}">
+                        <i-icon size="48" type="editor"></i-icon>
+                    </view>
+                    <view class="i-swipeout-button" style="width:60px" bindtap="soItemTapAction"  data-action="delete" data-game="{{game.objectId}}">
                         <i-icon size="48" type="delete_fill"></i-icon>
                     </view>
                 </view>

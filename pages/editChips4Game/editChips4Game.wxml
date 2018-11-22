@@ -1,0 +1,26 @@
+<form bindsubmit="formSubmit" class="page__bd">
+    <view class="weui-cells__title">请输入级别详情</view>
+    <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label">名称</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="name" disabled="{{submitting}}" class="weui-input" type="text" placeholder="请输入名称" value="{{chips.name}}" auto-focus confirm-type="next" />
+            </view>
+        </view>
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label">筹码</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="value" disabled="{{submitting}}" class="weui-input" type="number" placeholder="请输入小盲" value="{{chips.value}}" confirm-type="next" />
+            </view>
+        </view>
+    </view>
+
+    <view class="weui-btn-area">
+        <button wx:if="{{action==='add'}}" loading="{{submitting}}" class="weui-btn" type="primary" formType="submit">添加</button>
+        <button wx:if="{{action==='edit'}}" loading="{{submitting}}" class="weui-btn" type="primary" formType="submit">保存</button>
+    </view>
+</form>

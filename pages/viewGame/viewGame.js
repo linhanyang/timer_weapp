@@ -1,4 +1,4 @@
-// pages/viewGame_/viewGame_.js
+const util = require('../../utils/util.js')
 var Parse = require('../../parse');
 let Game = Parse.Object.extend("Game");
 let sgame;
@@ -31,10 +31,9 @@ Page({
       sgame.unsubscribe();
     }
   },
-
   /**
-  * 添加或减少rebuy次数 addon次数 玩家人数
-  */
+    * 添加或减少 玩家人数 等属性
+    */
   onActionTap: function (e) {
     let action = e.detail.action;
     let props = e.detail.props;
@@ -70,6 +69,17 @@ Page({
       default:
         break;
     }
+    //更新game
+    this._updateGame(game);
+  },
+  /**
+  * 更新chips
+  */
+  onActionTapChips: function (e) {
+    let chipss = e.detail.chipss;
+    console.log(`viewGame_chipssnActionTap:chipss:${chipss} `);
+    let game = this.data.game;
+    game.set('chipss', chipss);
     //更新game
     this._updateGame(game);
   },
@@ -127,7 +137,7 @@ Page({
   onStartImmediate: function (e) {
     console.log(`viewGame_:onStartImmediate`)
     let game = this.data.game;
-    game.set('startTime', new Date())
+    game.set('startTime', new Date());
     this._updateGame(game);
   },
 
@@ -258,7 +268,6 @@ Page({
   _updateGame: function (game) {
     //这两个属性不需要保存到服务器
     game.unset('pauseTimeMills');
-    game.unset('startTimeMills');
     game.save().then(function (game) {
       console.log(`viewGame_:_updateGame::${game.id}`)
     }, function (error) {
@@ -275,9 +284,9 @@ Page({
     let that = this;
     let query = new Parse.Query(Game);
     query.get(objectId).then(function (game) {
-      console.log(`viewGame_:_fetchGame:game:${game && game.get('title')}`);
+      console.log(`viewGame_:_fetchGame:startTime:${game && game.get('startTime')}`);
       that.setData({ game, gameForView: that._createGameForView(game), loading: false }, function () {
-        console.log(`viewGame_:_fetchGame:setDataFinished:game:startTime:${game.get('startTimeMills')}`);
+        console.log(`viewGame_:_fetchGame:setDataFinished:game:startTime:${game.get('startTime')}`);
         this._subscribeGame();
       });
     }).catch(function (error) {
@@ -300,7 +309,7 @@ Page({
       }
     }
 
-    
+
     let notification = game.get('notification');
     if (notification) {
       let notifications = notification.split('\n');
@@ -308,33 +317,35 @@ Page({
         notification = notifications[0] + " ..."
       }
     }
-    //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
-    //添加startTimeMills、pauseTimeMills字段，根据startTime、pauseTime的getTime()生成startTimeMills
+
+
+    let startTime4View = game.get('startTime4View');
+    if (!startTime4View)
+      startTime4View = game.get('startTime');
+    startTime4View = util.formatDateTimeShort(startTime4View)
+
     let gameForView = {
       //id
       id: game.id,
       objectId: game.id,
       //desc
       title: game.get('title'),
-      startTimeMills: game.get('startTime').getTime(),
-      startChips: game.get('startChips'),
-      rebuy: game.get('rebuy'),
-      rebuyChips: game.get('rebuyChips'),
-      rebuyCount: game.get('rebuyCount'),
-      addon: game.get('addon'),
-      addonChips: game.get('addonChips'),
-      addonCount: game.get('addonCount'),
+      startTime4View,
+      //传递date对象 在组件countdown 某些手机读取不到。所以直接传基本类型的number
+      startTime: game.get('startTime').getTime(),
       players: game.get('players'),
       restPlayers: game.get('restPlayers'),
       rewardPlayers: game.get('rewardPlayers'),
-      reward:reward,
+      reward: reward,
       notification: notification,
-      //rounds
       rounds: game.get('rounds'),
+      chipss: game.get('chipss'),
     };
     if (game.get('pauseTime')) {
-      gameForView = { ...gameForView, pauseTime: game.get('pauseTime'), pauseTimeMills: game.get('pauseTime').getTime() };
+      gameForView = { ...gameForView, pauseTime: game.get('pauseTime').getTime() };
     }
+    
+    console.log(`viewGame_:_createGameForView:startTime:${gameForView && gameForView.startTime}`);
     return gameForView;
   }
 })

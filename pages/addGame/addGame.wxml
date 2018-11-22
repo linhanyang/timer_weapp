@@ -1,0 +1,80 @@
+<view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+    <view class="page__bd">
+        <view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">错误提示</view>
+        <view class="weui-cells__title">比赛信息</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_input {{titleError ? 'weui-cell_warn' : ''}}">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">主标题</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input id="title" auto-focus class="weui-input" placeholder="请输入标题" bindblur="bindBlur" value="Hulu计时" />
+                </view>
+                <view wx:if="{{titleError}}" class="weui-cell__ft">
+                    <icon id="title" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">日期</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker mode="date" value="{{date}}" start="{{date}}" bindchange="bindDateChange">
+                        <view class="weui-input">{{date}}</view>
+                    </picker>
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">时间</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker mode="time" value="{{time}}" start="{{time}}" bindchange="bindTimeChange">
+                        <view class="weui-input">{{time}}</view>
+                    </picker>
+                </view>
+            </view>
+        </view>
+        <view class="component__hd">筹码方案</view>
+        <view wx:if="{{!chipss||chipss.length===0}}" class="weui-cells__title">
+            筹码方案为空，请用【 追加方案】添加。
+        </view>
+        <block wx:for="{{chipss}}" wx:key="name" wx:for-item="chips" wx:for-index="idx">
+            <i-swipeout i-class="i-swipeout-item" operateWidth="{{60}}" unclosable="{{true}}" toggle="{{toggles[idx]}}" actions="{{soActions}}" 
+            data-chips-name="{{chips.name}}" bindchange="handlerSoChange" bind:expandedChange="onExpandedChange" data-index="{{idx}}">
+                <view slot="content" bindtap="handlerSoCotentTap" data-chips-name="{{chips.name}}">
+                    <i-cell   i-class="i-cell-padding">
+                        {{chips.name}} {{chips.value}}
+                    </i-cell >
+                </view>
+            </i-swipeout>
+        </block>
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="normal" bindtap="bindAppendTap" loading="{{saving}}">
+                追加方案
+            </button>
+        </view>
+
+        <view class="weui-cells__title">请选择盲注模板</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_input {{patternError ? 'weui-cell_warn' : ''}}">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">盲注模板</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker bindchange="bindPatternChange" value="{{patternIndex}}" range="{{patterns4View}}" range-key="title">
+                        <input id="pattern" disabled class="weui-input" placeholder="请选择盲注模板" value="{{patterns4View[patternIndex].title}}"></input>
+                    </picker>
+                </view>
+                <view wx:if="{{patternError}}" class="weui-cell__ft">
+                    <icon id="pattern" bindtap="bindErrorTip" type="warn" size="23" color="#E64340"></icon>
+                </view>
+            </view>
+        </view>
+        <view class="weui-btn-area">
+            <button class="weui-btn" type="primary" bindtap="bindSubmitTap" loading="{{saving}}">
+                确定
+            </button>
+        </view>
+    </view>
+</view>

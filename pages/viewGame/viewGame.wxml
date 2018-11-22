@@ -1,9 +1,9 @@
 <wxs src="../../utils/util.wxs" module="util" />
 <i-load-more wx:if="{{loading}}" tip="正在获取数据" loading="{{ true }}" />
-<view wx:else class="page">
+<view wx:if="{{gameForView}}" class="page">
     <view class="page__bd page__bd_spacing">
         <!-- 简单描述 -->
-        <desc game="{{gameForView}}" bind:actionTap="onActionTap"></desc>
+        <desc game="{{gameForView}}" bind:actionTap="onActionTap" bind:actionTapChips="onActionTapChips"></desc>
         <!-- 倒计时 计算当前倒计时  当前盲注等 通过事件向page传递相关计算结果 -->
         <!-- 注意 这个game已经不是parse对象 -->
         <countdown game="{{gameForView}}" bind:currentRoundIndexChange="onCurrentRoundIndexChange" bind:statusChange="onStatusChange" bind:pause="onPause" bind:resume="onResume" bind:startImmediate="onStartImmediate"></countdown>

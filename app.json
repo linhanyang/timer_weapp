@@ -5,7 +5,7 @@
         "pages/patterns/patterns",
         "pages/mine/mine",
         "pages/editPattern/editPattern",
-        "pages/editGame/editGame",
+        "pages/addGame/addGame",
         "pages/viewGame/viewGame",
         "pages/editRound/editRound",
         "pages/editRound4pattern/editRound4pattern",
@@ -15,7 +15,9 @@
         "pages/dealShareRole/dealShareRole",
         "pages/editGameReward/editGameReward",
         "pages/editRoleTitle/editRoleTitle",
-        "pages/editGameNotification/editGameNotification"
+        "pages/editGameNotification/editGameNotification",
+        "pages/editChips4Game/editChips4Game",
+        "pages/editGame/editGame"
     ],
     "window": {
         "backgroundTextStyle": "light",

@@ -65,9 +65,8 @@ Page({
      * 新建按钮事件
      */
     handleCreateGame: function (e) {
-        //跳转到editGame的编辑界面
         wx.navigateTo({
-            url: `../editGame/editGame`,
+            url: `../addGame/addGame`,
         })
     },
 
@@ -86,7 +85,6 @@ Page({
         //因此只有oldExpanded和nextExpanded都为false时，才能说明这个swipeout是真正关闭的，才能跳转
         if (oldExpanded == false && nextExpanded == false) {
             let objectId = e.currentTarget.dataset.game;
-            //跳转到editGame的编辑界面
             wx.navigateTo({
                 url: `../viewGame/viewGame?objectId=${objectId}`,
             })
@@ -168,17 +166,32 @@ Page({
     /**
      * swipeOut的删除事件
      */
-    soDeleteTapAction: function (e) {
+    soItemTapAction: function (e) {
+        let action = e.currentTarget.dataset.action;
         let objectId = e.currentTarget.dataset.game;
         console.log(`games:soDeleteTapAction:objectId:${objectId}`);
         //找
         let game = this.data.games.find(function (value) {
             return value.id === objectId;
         });
-        this.setData({
-            asVisible: true,
-            soGame: game
-        });
+        //删除弹出确认actionSheet
+        if ('delete' === action) {
+            this.setData({
+                asVisible: true,
+                soGame: game
+            });
+        } else if ('edit' === action) {
+            //编辑直接跳转
+            wx.navigateTo({
+                url: `../editGame/editGame?objectId=${objectId}`,
+            })
+
+            this.setData({
+                asVisible: false,
+                soGame: null,
+            });
+            this._closeAllSwipeout();
+        }
     },
     /**
      * 关闭所有有的swipeout 除了指定的index
@@ -213,9 +226,16 @@ Page({
     _createGamesForView: function (games) {
         let gamesForView = [];
         games.forEach(item => {
-            //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
-            //添加startTimeMills字段，根据startTime的getTime()生成startTimeMills 
-            gamesForView.push({ objectId: item.id, id: item.id, title: item.get('title'), startTime: item.get('startTime'), startTimeMills: item.get('startTime').getTime() })
+            let startTime4View = item.get('startTime4View');
+            if (!startTime4View)
+                startTime4View = item.get('startTime');
+            startTime4View = util.formatDateTimeShort(startTime4View)
+            console.log(`games:_createGamesForView:startTime4View:${startTime4View}`);
+            gamesForView.push({
+                objectId: item.id,
+                id: item.id, title: item.get('title'),
+                startTime4View
+            })
         });
         return gamesForView;
     },
@@ -255,7 +275,7 @@ Page({
      * 还用于共享权限时其它用户新建删除更新等操作
      */
     _subscribeGames: function () {
-        
+
         if (sgames) {
             sgames.unsubscribe();
             sgames = null;

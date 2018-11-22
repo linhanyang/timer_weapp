@@ -418,8 +418,6 @@ Page({
   _createUsersForView: function (users) {
     let usersForView = [];
     users.forEach(item => {
-      //因为wxml不能直接格式化date对像 但在wxs中可以用毫秒数
-      //添加startTimeMills字段，根据startTime的getTime()生成startTimeMills 
       usersForView.push({ objectId: item.id, id: item.id, username: item.get('username'), nickName: item.get('nickName'), avatarUrl: item.get('avatarUrl') })
     });
     return usersForView;
